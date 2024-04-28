@@ -8,7 +8,7 @@ Antes de comenzar a trabajar en el proyecto, necesitas configurar tu entorno de 
 
 ### Prerrequisitos
 
-- [NVM](https://github.com/coreybutler/nvm-windows) (para utilizar la misma version Node)
+- [NVM](https://github.com/coreybutler/nvm-windows) (para utilizar la misma version de Node)
 
    ```bash
     nvm install $(Get-Content .nvmrc)
@@ -113,7 +113,7 @@ Utiliza `Ask` para cambios significativos que requieren discusión y revisión d
 2. Realiza tus cambios y realiza commits:
 
    ```bash
-   git commit -am "Start a big new feature"
+   git commit -m "Start a big new feature"
    ```
 
 3. Abre una Pull Request en GitHub y etiquétala como `Ask`.
