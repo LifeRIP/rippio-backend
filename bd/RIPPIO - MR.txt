@@ -1,0 +1,74 @@
+DATOS_USUARIOS (id-pk,identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon)
+	tipo_usuario -> ROL.id
+
+ROL (id-pk, rol)
+
+ADMINISTRADOR (id-pk, id_direccion)
+	id -> DATOS_USUARIOS.id
+	id_direccion -> DIRECCION.id  
+
+RESTAURANTE (id-pk, calificacion, img_banner)
+	id -> DATOS_USUARIOS.id
+
+PLAN (id-pk, nombre, descripcion) 
+
+PLAN_USUARIO (id-pk, id_usuario, id_plan, estado, fecha_inicio, fecha_termino)
+	id_usuario -> DATOS_USUARIOS.id
+	id_plan -> PLAN.id
+
+DIRECCION (id-pk, departamento, ciudad, barrio, tipo_via, numero_via, numero_uno, numero_dos, observaciones)
+
+DIRECCION_USUARIO (id-pk, id_usuario, id_direccion)
+	id_direccion -> DIRECCION.id
+	id_usuario -> DATOS_USUARIOS.id
+	
+DIRECCION_RESTAURANTE (id-pk, id_restaurante, id_direccion)
+	id_direccion -> DIRECCION.id
+	id_restaurante -> RESTAURANTE.id
+		
+METODO_PAGO (id-pk, nombre)
+
+DETALLES_METODO_PAGO (id-pk, id_usuario, id_metodo_pago, nombre, apellido, numero, expiracion, cvv)
+	id_usuario -> DATOS_USUARIOS.id
+	id_metodo_pago -> METODO_PAGO.id
+
+PEDIDO (id-pk, id_usuario, id_restaurante, id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, observaciones)
+	id_usuario -> DATOS_USUARIOS.id
+	id_restaurante -> RESTAURANTE.id
+	id_direccion -> DIRECCION.id
+	id_detalles_metodo_pago-> DETALLES_METODO_PAGO.id
+
+MENSAJE (id-pk, id_pedido, usuario_enviando, mensaje, fecha)
+	id_pedido -> PEDIDO.id
+
+CATEGORIA (id-pk, nombre)
+
+CATEGORIA_RES (id-pk, id_restaurante, id_categoria)
+	id_restaurante -> RESTAURANTE.id
+	id_categoria   -> CATEGORIA.id
+	
+HORARIO (id-pk, id_restaurante, dia_semana, hora_apertura, hora_cierre)
+	id_restaurante -> RESTAURANTE.id
+
+PRODUCTO(id-pk, id_restaurante, estado, nombre, descripcion, costo_unit, img_product)
+	id_restaurante -> RESTAURANTE.id
+
+CATEGORIA_PROD (id-pk, id_producto, id_categoria)
+	id_producto  -> PRODUCTO.id
+	id_categoria -> CATEGORIA.id
+	
+DETALLE_PEDIDO (id-pk, id_pedido, id_producto, costo_unit, cantidad_prod)
+	id_pedido -> PEDIDO.id
+	id_producto -> PRODUCTO.id
+
+CARRITO (id-pk, id_usuario, id_producto, cantidad_prod)
+	id_usuario -> USUARIO.id
+	id_producto -> PRODUCTO.id
+
+
+
+NOTAS:
+- En MENSAJE el atributo mensaje_enviado es un bool, si es true, lo envió el usuario, si es false lo envió el restaurante.
+
+- Contiene -> DETALLES_PEDIDO
+- Desea -> CARRITO
