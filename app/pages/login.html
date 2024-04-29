@@ -1,32 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <script src="login.js" defer></script>
 </head>
+
 <body>
-    <h1>Login</h1>
-<form id="login-form">
-    <input type="text" name="Correo" id="Correo" placeholder="Correo Electronico"></input>
-    <input type="password" name="Password" id="Password" placeholder="Contraseña"></input>
-    <button type="submit">ingresar</button>
-</form>
+    <main>
+        <div class="form-container">
+            <h1>Login</h1>
+            <form id="login-form">
+                <input type="email" name="email" id="email" placeholder="Correo Electronico"></input>
+                <input type="password" name="password" id="password" placeholder="Contraseña"></input>
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+        </div>
+    </main>
+    
+    
 </body>
+
 </html>
-
-<script>
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
-        event.preventDefault(); // Evita que el formulario se envíe automáticamente
-
-        // Obtener los valores de los campos de entrada
-        const username = document.querySelector('input[name="username"]').value;
-        const password = document.querySelector('input[name="password"]').value;
-
-        // Puedes hacer algo con los datos, como enviarlos a un servidor, validarlos, etc.
-        console.log("Username:", username);
-        console.log("Password:", password);
-        
-        // Aquí podrías llamar a una función para procesar los datos del login
-    });
-</script>
