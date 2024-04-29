@@ -1,17 +1,21 @@
-const Express = require('express');
-const authentication = require('./controllers/auth.controller');
+const express = require("express");
+const { register, login } = require("./controllers/auth.controller");
 
-//server
+// Server
 
-const app = Express();
+const app = express();
 app.set("port", 4000);
 app.listen(app.get("port"));
-console.log("servidor corriendo en el puerto", app.get("port"));
+console.log(`Servidor corriendo en http://localhost:${app.get("port")}/`);
 
-//Configuracion
+app.use(express.json()); // Para que express pueda entender los datos que vienen del cliente
+
+// Configuracion
 app.use(Express.static(__dirname + "/public"));
 app.use(Express.json());
 
-//Rutas
-app.get("/login",(req,res)=> res.sendFile(__dirname + "/pages/login.html"))
-app.post("/api/login",authentication.login);
+// Rutas
+app.get("/", (req, res) => res.sendFile(__dirname + "/pages/login.html"));
+app.get("/login", (req,res) => res.sendFile(__dirname + "/pages/login.html"))
+app.post("/api/login", login);
+app.post("/api/register", register);

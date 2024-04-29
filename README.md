@@ -10,42 +10,42 @@ Antes de comenzar a trabajar en el proyecto, necesitas configurar tu entorno de 
 
 - [NVM](https://github.com/coreybutler/nvm-windows) (para utilizar la misma version de Node)
 
-   ```bash
-    nvm install $(Get-Content .nvmrc)
-    nvm use $(Get-Content .nvmrc)
-   ```
+  ```bash
+   nvm install $(Get-Content .nvmrc)
+   nvm use $(Get-Content .nvmrc)
+  ```
 
 - PNPM (recomendado)
 
-   ```bash
-   npm install -g pnpm
-   ```
+  ```bash
+  npm install -g pnpm
+  ```
 
-    o
+  o
 
 - NPM
 
-   ```bash
-   npm install npm@latest -g
-   ```
+  ```bash
+  npm install npm@latest -g
+  ```
 
 ### Instalación
 
 Configurar el entorno de desarrollo local:
 
-   ```bash
-   git clone https://github.com/LifeRIP/Rippio-Backend.git
-   cd Rippio-Backend
-   pnpm install
-   ```
+```bash
+git clone https://github.com/LifeRIP/Rippio-Backend.git
+cd Rippio-Backend
+npm install
+```
 
 ### Ejecución en ambiente local
 
 Ejecutar el proyecto en un entorno local:
 
-   ```bash
-   pnpm start
-   ```
+```bash
+pnpm run dev
+```
 
 ## Estrategia de Ramificación Ship/Show/Ask
 
