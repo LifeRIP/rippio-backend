@@ -2,7 +2,6 @@ const pool = require('../db/db');
 const bcrypt = require('bcrypt');
 
 async function login(req,res){
-    console.log(req.body);
     const email = req.body.email;
     const password = req.body.password;
     if(!email || !password){
