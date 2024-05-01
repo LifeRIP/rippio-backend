@@ -95,9 +95,8 @@ async function register(req, res) {
 
 async function login(req, res) {
   try {
-    const email = req.body.email;
-    const password = req.body.password;
-    if (!email || !password) {
+    const { email, contraseña } = req.body;
+    if (!email || !contraseña) {
       return res.status(400).send({
         status: "Error",
         message: "Los campos estan incompletos",
@@ -119,7 +118,7 @@ async function login(req, res) {
 
     // Validar la contraseña
     const PasswordValid = await bcrypt.compare(
-      password,
+      contraseña,
       user.rows[0].contraseña
     );
 
@@ -131,7 +130,10 @@ async function login(req, res) {
     }
 
     //TODO: Crear token de autenticación
-    res.status(200);
+    res.status(200).json({
+      status: "Exitoso",
+      message: "Inicio de Sesion exitoso",
+    });
 
     console.log("Inicio de Sesion exitoso");
   } catch (error) {
