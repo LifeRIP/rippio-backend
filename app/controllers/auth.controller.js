@@ -10,7 +10,7 @@ async function register(req, res) {
       apellido,
       email,
       telefono,
-      contraseña,
+      password,
       tipo_usuario,
     } = req.body;
 
@@ -23,7 +23,7 @@ async function register(req, res) {
       !apellido ||
       !email ||
       !telefono ||
-      !contraseña ||
+      !password ||
       !tipo_usuario
     ) {
       return res.status(400).json({
@@ -63,7 +63,7 @@ async function register(req, res) {
 
     // Encriptar contraseña
     const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(contraseña, salt);
+    const hash = await bcrypt.hash(password, salt);
 
     // Insertar el usuario en la base de datos
     await pool.query(
@@ -95,15 +95,13 @@ async function register(req, res) {
 
 async function login(req, res) {
   try {
-    const { email, contraseña } = req.body;
-    if (!email || !contraseña) {
+    const { email, password } = req.body;
+    if (!email || !password) {
       return res.status(400).send({
         status: "Error",
         message: "Los campos estan incompletos",
       });
     }
-
-    // Validar que el usuario exista
     const user = await pool.query(
       "SELECT * FROM datos_usuarios where email = $1",
       [email]
@@ -116,9 +114,8 @@ async function login(req, res) {
       });
     }
 
-    // Validar la contraseña
     const PasswordValid = await bcrypt.compare(
-      contraseña,
+      password,
       user.rows[0].contraseña
     );
 
