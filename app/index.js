@@ -1,5 +1,4 @@
 const express = require("express");
-//const { register, login } = require("./controllers/auth.controller");
 const { router } = require("./routes/routes.js");
 
 // Server
@@ -9,14 +8,12 @@ app.listen(app.get("port"));
 console.log(`Servidor corriendo en http://localhost:${app.get("port")}/`);
 
 // Configuracion
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/public")); // Pruebas para el login
 app.use(express.json()); // Para que express pueda entender los datos que vienen del cliente
 
-// Rutas
+// Rutas API
+app.use("/api", router);
+
+// Rutas de pruebas para el login
 app.get("/", (req, res) => res.sendFile(__dirname + "/pages/login.html"));
 app.get("/login", (req, res) => res.sendFile(__dirname + "/pages/login.html"));
-
-// API
-app.use("/api", router);
-/* app.post("/api/login", login);
-app.post("/api/register", register); */
