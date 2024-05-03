@@ -42,7 +42,9 @@ function generateResetToken() {
       from: "Kevin <kevin.gil@correounivalle.edu.co>",
       to: email,
       subject: "Restablecer contraseña",
-      html: `Para restablecer tu contraseña, haz clic en el siguiente enlace: http://localhost:4000/reset-password?token=${token}`,
+
+      // TODO: Reestructurar función para que el enlace sea dinámico
+      html: `Para restablecer tu contraseña, haz clic en el siguiente enlace: http://localhost:4000/auth/recovery/reset-password?token=${token}`,
     };
   
     transporter.sendMail(mailOptions, (error, info) => {
