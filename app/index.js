@@ -1,36 +1,34 @@
 const { generateResetToken, getExpirationTime, sendResetEmail } = require("./services/mailService");
-const express = require("express");
 const { register, login } = require("./controllers/auth.controller");
 const { pool } = require("./database/dbConfig");
 const bcrypt = require("bcrypt");
 
-// Server
-
-const app = express();
+const express = require("express");
+const { router } = require("./routes/routes.js");
 const path = require('path');
-const { log } = require("console");
+
+// Server
+const app = express();
 app.set("port", 4000);
 app.listen(app.get("port"));
 console.log(`Servidor corriendo en http://localhost:${app.get("port")}/`);
 
 // Configuracion
 //app.use(express.static(__dirname + "/public"));
-app.use(express.static(path.join(__dirname, "public"))); //path.join es para que funcione en cualquier SO
+app.use(express.static(path.join(__dirname, "public"))); // path.join es para que funcione en cualquier SO
 app.use(express.json()); // Para que express pueda entender los datos que vienen del cliente
 
-// Rutas
+// Rutas API
+app.use("/api", router);
+
+// Rutas de pruebas para el login
 app.get("/", (req, res) => res.sendFile(__dirname + "/pages/login.html"));
 
 app.get("/recovery", (req, res) => res.sendFile(path.join(__dirname, "/pages/recovery.html")));
 app.get("/login", (req, res) => res.sendFile(__dirname + "/pages/login.html"));
 
 
-
-
-app.post("/api/login", login);
-app.post("/api/register", register);
-
-
+//  TODO: REESTRUCTURAR
 app.post('/forgot-password', async (req, res) => {
     try {
         const { email } = req.body;
