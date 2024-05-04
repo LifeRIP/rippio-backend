@@ -109,3 +109,23 @@ app.post('/forgot-password', async (req, res) => {
   
     res.json({ message: 'Contraseña restablecida exitosamente' });
   });
+
+
+  app.get ('/:id_restaurante', async (req, res) => { //función para buscar productos relacionados a una id de restaurante
+    const {id_restaurante} = req.params;
+
+    try {
+      const result = await pool.query('SELECT *FROM producto WHERE id_restaurante = $1', [id_restaurante]); //consulta en la base de datos la id solicitada y si la encuentra, retorna la tabla porductos asociada a esta
+      console.log(result.rows);
+
+      if (result.rows === 0) {
+        return res.status(404).json({ message: "restaurante no encontrado" });
+      }
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error en el servidor" });
+    }
+  }
+);
