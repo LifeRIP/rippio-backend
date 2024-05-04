@@ -32,6 +32,9 @@ DETALLES_METODO_PAGO (id-pk, id_usuario, id_metodo_pago, nombre, apellido, numer
 	id_usuario -> DATOS_USUARIOS.id
 	id_metodo_pago -> METODO_PAGO.id
 
+RESTABLECER_PASS (id-pk, token, expira)
+	id -> DATOS_USUARIOS.id
+
 PEDIDO (id-pk, id_usuario, id_restaurante, id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, observaciones)
 	id_usuario -> DATOS_USUARIOS.id
 	id_restaurante -> RESTAURANTE.id
