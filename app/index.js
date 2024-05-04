@@ -16,12 +16,7 @@ app.use(express.json()); // Para que express pueda entender los datos que vienen
 app.use("/api", router);
 
 // Rutas de pruebas para el login
-app.get("/", (req, res) =>
-  res.sendFile(path.join(__dirname, "/pages/login.html"))
-);
-app.get("/recovery", (req, res) =>
-  res.sendFile(path.join(__dirname, "/pages/recovery.html"))
-);
-app.get("/login", (req, res) =>
-  res.sendFile(path.join(__dirname, "/pages/login.html"))
-);
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "/pages/login.html")));
+app.get("/forgot-password", (req, res) => res.sendFile(path.join(__dirname, "/pages/forgot-password.html")));
+app.get("/reset-password", (req, res) => res.sendFile(path.join(__dirname, "/pages/reset-password.html")));
+app.get("/login", (req, res) => res.sendFile(path.join(__dirname, "/pages/login.html")));

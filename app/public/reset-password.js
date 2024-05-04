@@ -7,7 +7,7 @@ const resetPasswordForm = document.getElementById('reset-password-form');
       const newPassword = document.getElementById('newPassword').value;
 
       try {
-        const response = await fetch('/reset-password', {
+        const response = await fetch('http://localhost:4000/api/recovery/reset-password', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

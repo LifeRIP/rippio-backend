@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const dotenv = require("dotenv");
-dotenv.config();
+require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
     host:"smtp.gmail.com",
@@ -13,51 +12,38 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-/*export async function enviarMail(email, token){
-    transporter.sendMail({
-        from: "Kevin <kevin.gil@correounivalle.edu.co>",
-        to: email,
-        subject: "Restablecer contraseña",
-        html: "`Para restablecer tu contraseña, haz clic en el siguiente enlace: http://localhost:4000/recovry/${token}`,",
-
-    })
-};
-*/
-
-//Recovery
-
-
+// Funcion para generar un token de recuperacion
 function generateResetToken() {
     return crypto.randomBytes(20).toString('hex');
   };
   
-  function getExpirationTime() {
-    const now = new Date();
-    now.setTime(now.getTime() + 3600000);
-    return now; // 1 hora a partir de ahora
-  };
+function getExpirationTime() {
+  const now = new Date();
+  now.setTime(now.getTime() + 15 * 60 * 1000); // 15 minutos a partir de ahora
+  return now;
+};
   
-  function sendResetEmail(email, token) {
-    const mailOptions = {
-      from: "Kevin <kevin.gil@correounivalle.edu.co>",
-      to: email,
-      subject: "Restablecer contraseña",
+function sendResetEmail(email, token) {
+  const mailOptions = {
+    from: `Rippio <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Restablecer contraseña",
 
-      // TODO: Reestructurar función para que el enlace sea dinámico
-      html: `Para restablecer tu contraseña, haz clic en el siguiente enlace: http://localhost:4000/auth/recovery/reset-password?token=${token}`,
-    };
-  
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Correo enviado: ' + info.response);
-      }
-    })}
-
-  module.exports = {
-    generateResetToken,
-    getExpirationTime,
-    sendResetEmail,
+    // TODO: Reestructurar función para que el enlace sea dinámico
+    html: `Para restablecer tu contraseña, haz clic en el siguiente enlace: http://localhost:4000/api/recovery/reset-password?token=${token}`,
   };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Correo enviado: ' + info.response);
+    }
+  })}
+
+module.exports = {
+  generateResetToken,
+  getExpirationTime,
+  sendResetEmail,
+};
   
