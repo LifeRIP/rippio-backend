@@ -14,8 +14,6 @@ async function register(req, res) {
       tipo_usuario,
     } = req.body;
 
-    console.log(req.body);
-
     // Validar que los campos no estén vacíos
     if (
       !identificacion ||
@@ -26,10 +24,7 @@ async function register(req, res) {
       !password ||
       !tipo_usuario
     ) {
-      return res.status(400).json({
-        status: "Error",
-        message: "Faltan campos por llenar",
-      });
+      return res.status(400).json({ message: "Faltan campos por llenar" });
     }
 
     // Validar que el email no esté registrado
@@ -39,10 +34,7 @@ async function register(req, res) {
     );
 
     if (emailExist.rows.length > 0) {
-      return res.status(400).json({
-        status: "Error",
-        message: "El email ya está registrado",
-      });
+      return res.status(400).json({ message: "El email ya está registrado" });
     }
 
     // Validar que la identificación no esté registrada
@@ -52,10 +44,7 @@ async function register(req, res) {
     );
 
     if (identificacionExist.rows.length > 0) {
-      return res.status(400).json({
-        status: "Error",
-        message: "La identificación ya está registrada",
-      });
+      return res.status(400).json({ message: "La identificación ya está registrada" });
     }
 
     // Crear un id único para el usuario
@@ -81,63 +70,49 @@ async function register(req, res) {
       ]
     );
 
-    res.status(201).json({
-      status: "Exitoso",
-      message: "Usuario registrado exitosamente",
-    });
+    res.status(201).json({ message: "Usuario registrado exitosamente" });
   } catch (error) {
-    res.status(500).json({
-      status: "Error",
-      message: "Ha ocurrido un error al registrar el usuario",
-    });
+    res.status(500).json({ message: "Ha ocurrido un error al registrar el usuario" });
   }
 }
 
 async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    const { 
+      email,
+      password 
+    } = req.body;
+    
+    // Validar que los campos no estén vacíos
     if (!email || !password) {
-      return res.status(400).send({
-        status: "Error",
-        message: "Los campos estan incompletos",
-      });
+      return res.status(400).json({ message: "Los campos estan incompletos" });
     }
+
+    // Validar que el usuario exista
     const user = await pool.query(
-      "SELECT * FROM datos_usuarios where email = $1",
+      "SELECT * FROM datos_usuarios WHERE email = $1",
       [email]
     );
 
     if (user.rows.length === 0) {
-      return res.status(401).send({
-        status: "Error",
-        message: "Error de inicio de sesion",
-      });
+      return res.status(401).send({ status: "Error", message: "Error de inicio de sesion", });
     }
 
+    // Validar la contraseña
     const PasswordValid = await bcrypt.compare(
       password,
       user.rows[0].contraseña
     );
 
     if (!PasswordValid) {
-      return res.status(401).send({
-        status: "Error",
-        message: "Contraseña Incorrecta",
-      });
+      return res.status(401).send({ message: "Contraseña Incorrecta" });
     }
 
     //TODO: Crear token de autenticación
-    res.status(200).json({
-      status: "Exitoso",
-      message: "Inicio de Sesion exitoso",
-    });
 
-    console.log("Inicio de Sesion exitoso");
+    res.json({ message: "Inicio de Sesion exitoso" });
   } catch (error) {
-    res.status(500).json({
-      status: "Error",
-      message: "Ha ocurrido un error al iniciar sesion",
-    });
+    res.status(500).json({ message: "Ha ocurrido un error al iniciar sesion" });
   }
 }
 
