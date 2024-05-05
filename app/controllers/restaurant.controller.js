@@ -1,6 +1,6 @@
 const { pool } = require("../database/dbConfig");
 
-async function getAllRestaurant(req, res) {
+async function getAll(req, res) {
   try {
     //TODO: si se quita el atributo tipo_usuario, hacer join de restaurantes y datos_usuarios
     const response = await pool.query(
@@ -34,4 +34,4 @@ async function getTopCiudad(req, res) {
   }
 }
 
-module.exports = { getAllRestaurant, getTopCiudad };
+module.exports = { getAll, getTopCiudad };
