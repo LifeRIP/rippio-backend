@@ -1,6 +1,10 @@
 const bcrypt = require("bcrypt");
 const { v4: uuidv4 } = require("uuid");
 const { pool } = require("../database/dbConfig");
+const jsonwebtoken = require("jsonwebtoken");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 async function register(req, res) {
   try {
@@ -109,8 +113,21 @@ async function login(req, res) {
     }
 
     //TODO: Crear token de autenticación
+  
+    const token = jsonwebtoken.sign(
+      {
+        userID:user.rows[0].id
+      },
+      process.env.JWT_SECRET);
 
-    res.json({ message: "Inicio de Sesion exitoso" });
+      const cookieOption = {
+        expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        path: "/"
+      }
+    
+      res.cookie("JWT",token,cookieOption);
+    res.json({status:"ok",message:"Usuario loggeado"/*,redirect: "https://rippio.netlify.app/"*/});
+
   } catch (error) {
     res.status(500).json({ message: "Ha ocurrido un error al iniciar sesion" });
   }
