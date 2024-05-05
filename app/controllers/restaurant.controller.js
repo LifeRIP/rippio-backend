@@ -16,16 +16,16 @@ async function getAllRestaurant(req, res) {
 
 async function getTopCiudad(req, res) {
   try {
-    const ciudad = req.params.ciudad;
+    const ciudad = req.body.ciudad;
     const response = await pool.query(
       `SELECT r.id, du.img_icon, r.calificacion
       FROM restaurante r
       JOIN direccion_restaurante dr ON r.id = dr.id_restaurante
       JOIN direccion d ON dr.id_direccion = d.id
       JOIN datos_usuarios du ON du.id = r.id
-      WHERE d.ciudad = $1
+      WHERE d.ciudad = '${[ciudad]}'
       ORDER BY r.calificacion DESC
-      LIMIT 20`, [ciudad]
+      LIMIT 20`
     );
     res.json(response.rows);
   } catch (error) {

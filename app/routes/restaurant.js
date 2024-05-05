@@ -3,6 +3,6 @@ const router = express.Router();
 const { getAllRestaurant, getTopCiudad } = require("../controllers/restaurant.controller");
 
 router.get("/getAll", getAllRestaurant); // /api/restaurant/getAllRestaurant
-router.get("/getTopCiudad/:ciudad", getTopCiudad); // /api/restaurant/getTopImg
+router.get("/getTopCiudad", getTopCiudad); // /api/restaurant/getTopCiudad
 
 module.exports = router;
