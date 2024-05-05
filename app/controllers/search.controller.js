@@ -23,7 +23,9 @@ async function search(req, res) {
       FROM producto p
       JOIN datos_usuarios du ON du.id = p.id_restaurante
       JOIN restaurante r ON r.id = du.id
-      WHERE p.nombre ILIKE '%' || '${request}' || '%' OR p.descripcion ILIKE '%' || '${request}' || '%'
+      WHERE p.nombre ILIKE '%' || '${request}' || '%' 
+          OR p.descripcion ILIKE '%' || '${request}' || '%'
+          OR du.nombre ILIKE '%' || '${request}' || '%'
       GROUP BY r.id, du.nombre, r.calificacion, du.img_icon;`
     );
     res.json(response.rows);
