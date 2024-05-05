@@ -54,11 +54,10 @@ async function forgotPassword (req, res) {
 
 async function resetPassword(req, res) {
   try {
-    const { newPassword } = req.body;
-    const token = req.query.token;
+    const { token, newPassword } = req.body;
 
     // Verifica si la nueva contraseña no está vacía
-    if (!newPassword) {
+    if (!token || !newPassword) {
       return res.status(400).json({ message: "Faltan campos por llenar"});
     }
 
@@ -87,7 +86,7 @@ async function resetPassword(req, res) {
       user.rows[0].id,
     ]);
 
-    res.status(205).json({ message: "Contraseña restablecida exitosamente" });
+    res.status(201).json({ message: "Contraseña restablecida exitosamente" });
   } catch (error) {
     res.status(500).json({ message: "Ha ocurrido un error al restablecer la contraseña" });
   }
