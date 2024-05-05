@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { getAllRestaurant } = require("../controllers/restaurant.controller");
+const { getAllRestaurant, getTopCiudad } = require("../controllers/restaurant.controller");
 
-router.get("/getAllRestaurant", getAllRestaurant); // /api/restaurant/getAllRestaurant
+router.get("/getAll", getAllRestaurant); // /api/restaurant/getAllRestaurant
+router.get("/getTopCiudad/:ciudad", getTopCiudad); // /api/restaurant/getTopImg
 
 module.exports = router;
