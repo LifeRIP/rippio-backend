@@ -1,25 +1,22 @@
-const {tokenVerify} = require("../services/tokenVerify");
-
+const { tokenVerify } = require('../services/tokenVerify');
 
 const auth_user = async (req, res, next) => {
-    try{
+  try {
+    if (!req.headers.authorization) {
+      return res.status(401).json({ message: 'NOT_TOKEN' });
+    }
 
-        if(!req.headers.authorization){
-            return res.status(401).json({message: "NOT_TOKEN"});
-        };
-        
-        const token = req.headers.authorization.split(' ').pop();
-        const dataToken = await tokenVerify(token);
-        
-        if(!dataToken.userID){
-            return res.status(401).json({message: "ERROR_ID_TOKEN"});
-        };
+    const token = req.headers.authorization.split(' ').pop();
+    const dataToken = await tokenVerify(token);
 
-        next()
-        
-    }catch (e){
-        return res.status(401).json({message: "NOT_SESSION"});
-    };
-}
+    if (!dataToken.userID) {
+      return res.status(401).json({ message: 'ERROR_ID_TOKEN' });
+    }
+
+    next();
+  } catch (e) {
+    return res.status(401).json({ message: 'NOT_SESSION' });
+  }
+};
 
 module.exports = auth_user;
