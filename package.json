@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec node --env-file .env.local index.js",
-    "prod": "nodemon --exec node --env-file .env.production index.js"
+    "dev": "nodemon --ext js,mjs,cjs,json --exec node --env-file=.env.local index.js",
+    "prod": "nodemon --ext js,mjs,cjs,json --exec node --env-file=.env.production index.js"
   },
   "keywords": [],
   "author": "",

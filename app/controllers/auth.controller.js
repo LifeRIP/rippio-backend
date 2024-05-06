@@ -2,9 +2,6 @@ const bcrypt = require("bcrypt");
 const { v4: uuidv4 } = require("uuid");
 const { pool } = require("../database/dbConfig");
 const jsonwebtoken = require("jsonwebtoken");
-const dotenv = require("dotenv");
-
-dotenv.config();
 
 async function register(req, res) {
   try {
