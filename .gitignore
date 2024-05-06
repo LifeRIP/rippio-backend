@@ -1,2 +1,7 @@
+# Dependency directories
 node_modules/
+
+# Environments files
 .env
+.env.local
+.env.production

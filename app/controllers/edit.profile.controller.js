@@ -1,12 +1,12 @@
 const { pool } = require("../database/dbConfig");
 const bcrypt = require("bcrypt");
-const {tokenverify} = require("../services/tokenverify");
+const { tokenVerify } = require("../services/tokenVerify");
 
 async function change_data(req,res){
     try{
         
         const token = req.headers.authorization.split(' ').pop();
-        const dataToken = await tokenverify(token);
+        const dataToken = await tokenVerify(token);
 
         const{
           nombre,
@@ -33,7 +33,7 @@ async function change_data(req,res){
             return res.status(400).json({ message: "El numero de telefono ya está en uso" });
         }
 
-        //Actualizar informacion en la base de datos
+        // Actualizar informacion en la base de datos
 
         await pool.query(
             "UPDATE datos_usuarios SET nombre = $1 , apellido = $2 , telefono = $3 WHERE id = $4",
@@ -53,7 +53,7 @@ async function change_password(req,res){
     try{
 
         const token = req.headers.authorization.split(' ').pop();
-        const dataToken = await tokenverify(token);
+        const dataToken = await tokenVerify(token);
 
         const{
             oldpassword,
@@ -106,7 +106,7 @@ async function change_password(req,res){
         const salt = await bcrypt.genSalt(10);
         const hashedNewPassword = await bcrypt.hash(newpassword, salt);
 
-         //Actualizar contraseña en la base de datos
+         // Actualizar contraseña en la base de datos
 
          await pool.query(
             "UPDATE datos_usuarios SET contraseña = $1 WHERE id = $2",
@@ -127,7 +127,7 @@ async function add_address(req,res){
     try{
 
         const token = req.headers.authorization.split(' ').pop();
-        const dataToken = await tokenverify(token);
+        const dataToken = await tokenVerify(token);
 
         const{
             departamento,
@@ -152,7 +152,7 @@ async function add_address(req,res){
             return res.status(400).json({message: "Faltan campos por llenar"});
         }
 
-        //Crear nueva direccion en la base de datos
+        // Crear nueva direccion en la base de datos
         const newAddress = await pool.query(
             "INSERT INTO direccion(departamento, ciudad, barrio, tipo_via, numero_via, numero_uno, numero_dos, observaciones) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) returning *",
             [departamento,ciudad,barrio,tipo_via,numero_via,numero_uno,numero_dos,observaciones]

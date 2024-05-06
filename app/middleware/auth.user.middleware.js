@@ -1,4 +1,4 @@
-const {tokenverify} = require("../services/tokenverify");
+const {tokenVerify} = require("../services/tokenVerify");
 
 
 const auth_user = async (req, res, next) => {
@@ -9,7 +9,7 @@ const auth_user = async (req, res, next) => {
         };
         
         const token = req.headers.authorization.split(' ').pop();
-        const dataToken = await tokenverify(token);
+        const dataToken = await tokenVerify(token);
         
         if(!dataToken.userID){
             return res.status(401).json({message: "ERROR_ID_TOKEN"});
