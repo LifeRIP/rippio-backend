@@ -1,11 +1,11 @@
-const jsonwebtoken = require("jsonwebtoken")
+const jsonwebtoken = require('jsonwebtoken');
 
 const tokenVerify = async (tokenJWT) => {
-    try{
-        return jsonwebtoken.verify(tokenJWT, process.env.JWT_SECRET)
-    }catch(e){
-        return null
-    }
-}
+  try {
+    return jsonwebtoken.verify(tokenJWT, process.env.JWT_SECRET);
+  } catch (e) {
+    return null;
+  }
+};
 
-module.exports = {tokenVerify}
+module.exports = { tokenVerify };
