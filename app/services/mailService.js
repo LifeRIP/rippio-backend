@@ -1,9 +1,8 @@
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
-    host:"smtp.gmail.com",
+    host: process.env.EMAIL_HOST,
     port: 465,
     secure: true,
     auth:{
