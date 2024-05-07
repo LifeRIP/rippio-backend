@@ -1,6 +1,6 @@
 const { pool } = require('../database/dbConfig');
 
-async function getResID(req, res) {
+async function getByResID(req, res) {
   try {
     const id = req.params.id;
     const response = await pool.query(
@@ -24,4 +24,4 @@ async function getResID(req, res) {
   }
 }
 
-module.exports = { getResID };
+module.exports = { getByResID };

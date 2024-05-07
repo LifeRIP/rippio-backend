@@ -1,14 +1,14 @@
-DATOS_USUARIOS (id-pk, identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon)
+DATOS_USUARIOS (id-pk, identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon, activo)
 	tipo_usuario -> ROL.id
 
 ROL (id-pk, rol)
 
 ADMINISTRADOR (id-pk, id_direccion)
-	id -> DATOS_USUARIOS.id					cascada
-	id_direccion -> DIRECCION.id  			null
+	id -> DATOS_USUARIOS.id								cascada
+	id_direccion -> DIRECCION.id  						null
 
 RESTAURANTE (id-pk, calificacion, img_banner)
-	id -> DATOS_USUARIOS.id					cascada
+	id -> DATOS_USUARIOS.id								cascada
 
 PLAN (id-pk, nombre, descripcion) 
 
@@ -45,7 +45,7 @@ DETALLE_PEDIDO (id-pk, id_pedido, id_producto, costo_unit, cantidad_prod)
 	id_pedido -> PEDIDO.id								cascada
 	id_producto -> PRODUCTO.id							null
 	
-CALIFICACION_PEDIDO (id-pk, calificacion, comentarios)
+CALIFICACION_PEDIDO (id-pk, id_pedido, calificacion, comentarios)
 	id_pedido -> PEDIDO.id								cascada
 
 MENSAJE (id-pk, id_pedido, usuario_enviando, mensaje, fecha)

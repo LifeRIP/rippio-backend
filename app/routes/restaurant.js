@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const {
   getAll,
-  getTopCiudad,
+  getTopByCity,
 } = require('../controllers/restaurant.controller');
 
 router.get('/getAll', getAll); // /api/restaurant/getAll
-router.get('/getTopCiudad', getTopCiudad); // /api/restaurant/getTopCiudad
+router.get('/getTopByCity', getTopByCity); // /api/restaurant/getTopByCity
 
 module.exports = router;

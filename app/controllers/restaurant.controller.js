@@ -16,7 +16,7 @@ async function getAll(req, res) {
   }
 }
 
-async function getTopCiudad(req, res) {
+async function getTopByCity(req, res) {
   try {
     const ciudad = req.body.ciudad;
     const response = await pool.query(
@@ -38,4 +38,4 @@ async function getTopCiudad(req, res) {
   }
 }
 
-module.exports = { getAll, getTopCiudad };
+module.exports = { getAll, getTopByCity };

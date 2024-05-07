@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getResID } = require('../controllers/product.controller');
+const { getByResID } = require('../controllers/product.controller');
 
-router.get('/getResID/:id', getResID); // /api/product/getResID/:id
+router.get('/getByResID/:id', getByResID); // /api/product/getByResID/:id
 
 module.exports = router;
