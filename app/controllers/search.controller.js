@@ -1,4 +1,4 @@
-const { pool } = require("../database/dbConfig");
+const { pool } = require('../database/dbConfig');
 
 async function search(req, res) {
   try {
@@ -30,7 +30,9 @@ async function search(req, res) {
     );
     res.json(response.rows);
   } catch (error) {
-    res.status(500).json({ error: "Ha ocurrido un error al obtener los restaurantes" });
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los restaurantes' });
   }
 }
 

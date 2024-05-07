@@ -1,4 +1,4 @@
-const { pool } = require("../database/dbConfig");
+const { pool } = require('../database/dbConfig');
 
 async function getAll(req, res) {
   try {
@@ -10,7 +10,9 @@ async function getAll(req, res) {
     );
     res.json(response.rows);
   } catch (error) {
-    res.status(500).json({ error: "Ha ocurrido un error al obtener los restaurantes" });
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los restaurantes' });
   }
 }
 
@@ -30,7 +32,9 @@ async function getTopCiudad(req, res) {
     res.json(response.rows);
   } catch (error) {
     //console.error('Error en la consulta', error.message);
-    res.status(500).json({ error: "Ha ocurrido un error al obtener los restaurantes" });
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los restaurantes' });
   }
 }
 
