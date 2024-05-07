@@ -1,77 +1,82 @@
-DATOS_USUARIOS (id-pk,identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon)
+DATOS_USUARIOS (id-pk, identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon)
 	tipo_usuario -> ROL.id
 
 ROL (id-pk, rol)
 
 ADMINISTRADOR (id-pk, id_direccion)
-	id -> DATOS_USUARIOS.id
-	id_direccion -> DIRECCION.id  
+	id -> DATOS_USUARIOS.id					cascada
+	id_direccion -> DIRECCION.id  			null
 
 RESTAURANTE (id-pk, calificacion, img_banner)
-	id -> DATOS_USUARIOS.id
+	id -> DATOS_USUARIOS.id					cascada
 
 PLAN (id-pk, nombre, descripcion) 
 
 PLAN_USUARIO (id-pk, id_usuario, id_plan, estado, fecha_inicio, fecha_termino)
-	id_usuario -> DATOS_USUARIOS.id
-	id_plan -> PLAN.id
+	id_usuario -> DATOS_USUARIOS.id						cascada
+	id_plan -> PLAN.id									restringido
 
 DIRECCION (id-pk, departamento, ciudad, barrio, tipo_via, numero_via, numero_uno, numero_dos, observaciones)
 
 DIRECCION_USUARIO (id-pk, id_usuario, id_direccion)
-	id_direccion -> DIRECCION.id
-	id_usuario -> DATOS_USUARIOS.id
+	id_direccion -> DIRECCION.id						cascada
+	id_usuario -> DATOS_USUARIOS.id						cascada
 	
 DIRECCION_RESTAURANTE (id-pk, id_restaurante, id_direccion)
-	id_direccion -> DIRECCION.id
-	id_restaurante -> RESTAURANTE.id
+	id_direccion -> DIRECCION.id						cascada
+	id_restaurante -> RESTAURANTE.id					cascada
 		
 METODO_PAGO (id-pk, nombre)
 
 DETALLES_METODO_PAGO (id-pk, id_usuario, id_metodo_pago, nombre, apellido, numero, expiracion, cvv)
-	id_usuario -> DATOS_USUARIOS.id
-	id_metodo_pago -> METODO_PAGO.id
+	id_usuario -> DATOS_USUARIOS.id						cascada
+	id_metodo_pago -> METODO_PAGO.id					restringido
 
 RESTABLECER_PASS (id-pk, token, expira)
-	id -> DATOS_USUARIOS.id
+	id -> DATOS_USUARIOS.id					cascada
 
 PEDIDO (id-pk, id_usuario, id_restaurante, id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, observaciones)
-	id_usuario -> DATOS_USUARIOS.id
-	id_restaurante -> RESTAURANTE.id
-	id_direccion -> DIRECCION.id
-	id_detalles_metodo_pago-> DETALLES_METODO_PAGO.id
+	id_usuario -> DATOS_USUARIOS.id						null
+	id_restaurante -> RESTAURANTE.id					null
+	id_direccion -> DIRECCION.id						null
+	id_detalles_metodo_pago-> DETALLES_METODO_PAGO.id	null
+	
+DETALLE_PEDIDO (id-pk, id_pedido, id_producto, costo_unit, cantidad_prod)
+	id_pedido -> PEDIDO.id								cascada
+	id_producto -> PRODUCTO.id							null
+	
+CALIFICACION_PEDIDO (id-pk, calificacion, comentarios)
+	id_pedido -> PEDIDO.id								cascada
 
 MENSAJE (id-pk, id_pedido, usuario_enviando, mensaje, fecha)
-	id_pedido -> PEDIDO.id
+	id_pedido -> PEDIDO.id								cascada
 
 CATEGORIA (id-pk, nombre)
 
 CATEGORIA_RES (id-pk, id_restaurante, id_categoria)
-	id_restaurante -> RESTAURANTE.id
-	id_categoria   -> CATEGORIA.id
+	id_restaurante -> RESTAURANTE.id					cascada
+	id_categoria   -> CATEGORIA.id						cascada
 	
 HORARIO (id-pk, id_restaurante, dia_semana, hora_apertura, hora_cierre)
-	id_restaurante -> RESTAURANTE.id
+	id_restaurante -> RESTAURANTE.id					cascada
 
 PRODUCTO(id-pk, id_restaurante, estado, nombre, descripcion, costo_unit, img_product)
-	id_restaurante -> RESTAURANTE.id
+	id_restaurante -> RESTAURANTE.id					cascada
 
-CATEGORIA_PROD (id-pk, id_producto, id_categoria)
-	id_producto  -> PRODUCTO.id
-	id_categoria -> CATEGORIA.id
-	
-DETALLE_PEDIDO (id-pk, id_pedido, id_producto, costo_unit, cantidad_prod)
-	id_pedido -> PEDIDO.id
-	id_producto -> PRODUCTO.id
+SECCION (id-pk, nombre)
+
+SECCION_PROD (id-pk, id_producto, id_seccion)
+	id_producto  -> PRODUCTO.id							cascada
+	id_seccion -> SECCION.id							cascada
 
 CARRITO (id-pk, id_usuario, id_producto, cantidad_prod)
-	id_usuario -> USUARIO.id
-	id_producto -> PRODUCTO.id
+	id_usuario -> USUARIO.id							cascada
+	id_producto -> PRODUCTO.id							cascada
 
 
 
 NOTAS:
-- En MENSAJE el atributo mensaje_enviado es un bool, si es true, lo envió el usuario, si es false lo envió el restaurante.
+- En MENSAJE el atributo usuario_enviando es un bool, si es true, lo envió el usuario, si es false lo envió el restaurante.
 
 - Contiene -> DETALLES_PEDIDO
 - Desea -> CARRITO
