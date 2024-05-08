@@ -7,8 +7,9 @@ ADMINISTRADOR (id-pk, id_direccion)
 	id -> DATOS_USUARIOS.id								cascada
 	id_direccion -> DIRECCION.id  						null
 
-RESTAURANTE (id-pk, calificacion, img_banner)
+RESTAURANTE (id-pk, calificacion, img_banner, id_direccion)
 	id -> DATOS_USUARIOS.id								cascada
+	id_direccion -> DIRECCION.id						null
 
 PLAN (id-pk, nombre, descripcion) 
 
@@ -21,10 +22,6 @@ DIRECCION (id-pk, departamento, ciudad, barrio, tipo_via, numero_via, numero_uno
 DIRECCION_USUARIO (id-pk, id_usuario, id_direccion)
 	id_direccion -> DIRECCION.id						cascada
 	id_usuario -> DATOS_USUARIOS.id						cascada
-	
-DIRECCION_RESTAURANTE (id-pk, id_restaurante, id_direccion)
-	id_direccion -> DIRECCION.id						cascada
-	id_restaurante -> RESTAURANTE.id					cascada
 		
 METODO_PAGO (id-pk, nombre)
 
