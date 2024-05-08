@@ -1,11 +1,10 @@
 const { pool } = require('../database/dbConfig');
 const bcrypt = require('bcrypt');
-const { tokenVerify } = require('../services/tokenVerify');
 
 async function change_data(req, res) {
   try {
-    const token = req.headers.authorization.split(' ').pop();
-    const dataToken = await tokenVerify(token);
+    // Obtener el id del usuario despues de pasar por el middleware de autenticacion
+    const { id } = req.user;
 
     const { nombre, apellido, telefono } = req.body;
 
@@ -30,7 +29,7 @@ async function change_data(req, res) {
 
     await pool.query(
       'UPDATE datos_usuarios SET nombre = $1 , apellido = $2 , telefono = $3 WHERE id = $4',
-      [nombre, apellido, telefono, dataToken.userID]
+      [nombre, apellido, telefono, id]
     );
 
     res.json({ message: 'Actualizacion de datos exitosa' });
@@ -43,8 +42,8 @@ async function change_data(req, res) {
 
 async function change_password(req, res) {
   try {
-    const token = req.headers.authorization.split(' ').pop();
-    const dataToken = await tokenVerify(token);
+    // Obtener el id del usuario despues de pasar por el middleware de autenticacion
+    const { id } = req.user;
 
     const { oldpassword, newpassword, password_confirmation } = req.body;
 
@@ -56,7 +55,7 @@ async function change_password(req, res) {
     // Validar que la contraseña antigua sea correcta
     const dbuser = await pool.query(
       'SELECT * FROM datos_usuarios WHERE id = $1',
-      [dataToken.userID]
+      [id]
     );
 
     const PasswordValid = await bcrypt.compare(
@@ -94,7 +93,7 @@ async function change_password(req, res) {
 
     await pool.query(
       'UPDATE datos_usuarios SET contraseña = $1 WHERE id = $2',
-      [hashedNewPassword, dataToken.userID]
+      [hashedNewPassword, id]
     );
 
     res.json({ message: 'Actualizacion de contraseña exitosa' });
@@ -107,8 +106,8 @@ async function change_password(req, res) {
 
 async function add_address(req, res) {
   try {
-    const token = req.headers.authorization.split(' ').pop();
-    const dataToken = await tokenVerify(token);
+    // Obtener el id del usuario despues de pasar por el middleware de autenticacion
+    const { id } = req.user;
 
     const {
       departamento,
@@ -120,6 +119,7 @@ async function add_address(req, res) {
       numero_dos,
       observaciones,
     } = req.body;
+
     // Validar que los campos no estén vacíos
     if (
       !departamento ||
@@ -149,7 +149,7 @@ async function add_address(req, res) {
     );
     await pool.query(
       'INSERT INTO direccion_usuario(id_usuario, id_direccion) VALUES ($1, $2)',
-      [dataToken.userID, newAddress.rows[0].id]
+      [id, newAddress.rows[0].id]
     );
 
     res.json({ message: 'Nueva direccion agregada exitosamente' });

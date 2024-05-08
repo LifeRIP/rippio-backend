@@ -1,4 +1,5 @@
 const { tokenVerify } = require('../services/tokenVerify');
+const { pool } = require('../database/dbConfig');
 
 const auth_user = async (req, res, next) => {
   try {
@@ -12,6 +13,14 @@ const auth_user = async (req, res, next) => {
     if (!dataToken.userID) {
       return res.status(401).json({ message: 'ERROR_ID_TOKEN' });
     }
+
+    const user = await pool.query(
+      'SELECT * FROM datos_usuarios WHERE id = $1',
+      [dataToken.userID]
+    );
+
+    // Agregar el usuario a la request
+    req.user = user.rows[0];
 
     next();
   } catch (e) {
