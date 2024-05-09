@@ -14,7 +14,7 @@ async function register(req, res) {
       password,
       tipo_usuario,
     } = req.body;
-
+    
     // Validar que los campos no estén vacíos
     if (
       !identificacion ||
@@ -27,7 +27,7 @@ async function register(req, res) {
     ) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
-
+    
     // Validar que el email no esté registrado
     const emailExist = await pool.query(
       'SELECT * FROM datos_usuarios WHERE email = $1',
@@ -37,7 +37,7 @@ async function register(req, res) {
     if (emailExist.rows.length > 0) {
       return res.status(400).json({ message: 'El email ya está registrado' });
     }
-
+    
     // Validar que la identificación no esté registrada
     const identificacionExist = await pool.query(
       'SELECT * FROM datos_usuarios WHERE identificacion = $1',
@@ -89,18 +89,20 @@ async function login(req, res) {
     if (!email || !password) {
       return res.status(400).json({ message: 'Los campos estan incompletos' });
     }
+    
 
     // Validar que el usuario exista
     const user = await pool.query(
       'SELECT * FROM datos_usuarios WHERE email = $1',
       [email]
     );
-
+    
     if (user.rows.length === 0) {
       return res
         .status(401)
         .send({ status: 'Error', message: 'Error de inicio de sesion' });
     }
+    console.log("mi culo");
 
     // Validar la contraseña
     const PasswordValid = await bcrypt.compare(
