@@ -6,6 +6,6 @@ const auth_user = require('../middleware/auth.user.middleware');
 
 
 router.get('/getAll', getAll); // /api/plan/getAll
-router.post('/getPlan', auth_user, getPlan);
+router.post('/getPlan', auth_user, getPlan); // /api/plan/getPlan
 
 module.exports = router;
