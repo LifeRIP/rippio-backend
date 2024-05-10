@@ -1,3 +1,5 @@
+const express = require('express');
+const router = express.Router();
 const { pool } = require('../database/dbConfig');
 
 async function getAll(req, res) {
@@ -15,3 +17,7 @@ async function getAll(req, res) {
 }
 
 module.exports = { getAll };
+
+
+
+
