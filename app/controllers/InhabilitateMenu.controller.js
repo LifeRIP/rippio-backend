@@ -1,16 +1,16 @@
 const { pool } = require('../database/dbConfig');
 
-async function InhabMenu(req, res) { // Inhabilitar un menú a un restaurante en la base de datos
+async function InhabMenu(req, res) { // Inhabilitar y habilitar un producto a un restaurante en la base de datos
     
     const id_restaurante = req.user.id;
     
     const tipo_usuario = req.user.tipo_usuario;
 
     try {
-        //comprueba si el usuario es un admin
+        //comprueba si el usuario es un restaurante
         if (tipo_usuario === 3) {
             
-            //const { id_restaurante } = req.body;
+            
             const { nombre } = req.body;
             const {estado} = req.body;
 
