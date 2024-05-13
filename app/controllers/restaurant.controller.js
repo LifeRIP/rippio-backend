@@ -106,8 +106,8 @@ async function getCategoriesAndProductsByRestaurantId(req, res) {
             id: row.id,
             nombre: row.nombre,
             descripcion: row.descripcion,
-            costo: row.cost_unit,
-            img: row.img_product,
+            costo_unit: row.cost_unit,
+            img_product: row.img_product,
             estado: row.estado
           }]
         });
@@ -117,8 +117,8 @@ async function getCategoriesAndProductsByRestaurantId(req, res) {
           id: row.id,
           nombre: row.nombre,
           descripcion: row.descripcion,
-          costo: row.cost_unit,
-          img: row.img_product,
+          costo_unit: row.cost_unit,
+          img_product: row.img_product,
           estado: row.estado
         });
       }
