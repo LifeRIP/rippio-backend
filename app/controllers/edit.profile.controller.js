@@ -160,4 +160,58 @@ async function add_address(req, res) {
   }
 }
 
-module.exports = { change_data, change_password, add_address };
+async function modify_address(req, res) {
+  try {
+    // Obtener el id del usuario despues de pasar por el middleware de autenticacion
+    const { id } = req.user;
+
+    const {
+      id_direccion,
+      departamento,
+      ciudad,
+      barrio,
+      tipo_via,
+      numero_via,
+      numero_uno,
+      numero_dos,
+      observaciones,
+    } = req.body;
+
+    // Validar que los campos no estén vacíos
+    if (
+      !id_direccion ||
+      !departamento ||
+      !ciudad ||
+      !barrio ||
+      !tipo_via ||
+      !numero_via ||
+      !numero_uno ||
+      !numero_dos
+    ) {
+      return res.status(400).json({ message: 'Faltan campos por llenar' });
+    }
+
+    // Actualiza direccion en la base de datos
+    await pool.query(
+      'UPDATE direccion SET departamento=$1, ciudad=$2, barrio=$3, tipo_via=$4, numero_via=$5, numero_uno=$6, numero_dos=$7, observaciones=$8 WHERE id = $9',
+      [
+        departamento,
+        ciudad,
+        barrio,
+        tipo_via,
+        numero_via,
+        numero_uno,
+        numero_dos,
+        observaciones,
+        id_direccion
+      ]
+    );
+    res.json({ message: 'La direccion se modificó exitosamente' });
+  } catch (e) {
+    res
+      .status(500)
+      .json({ message: 'Ha ocurrido un error al modificar la direccion' });
+  }
+}
+
+module.exports = { change_data, change_password, add_address, modify_address};
