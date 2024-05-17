@@ -2,7 +2,7 @@ const { pool } = require('../database/dbConfig');
 
 async function search(req, res) {
   try {
-    const request = req.body.request;
+    const request = req.query.request;
     const response = await pool.query(
       //TODO: para buscar solo los productos activos agregar en el WHERE -> AND p.estado = true
       `SELECT
