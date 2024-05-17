@@ -1,75 +1,75 @@
 DATOS_USUARIOS (id-pk, identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon, estado)
-	tipo_usuario -> ROL.id								restringido
+	tipo_usuario -> ROL.id
 
 ROL (id-pk, rol)
 
 ADMINISTRADOR (id-pk, id_direccion)
-	id -> DATOS_USUARIOS.id								cascada
-	id_direccion -> DIRECCION.id  						null
+	id -> DATOS_USUARIOS.id
+	id_direccion -> DIRECCION.id
 
 RESTAURANTE (id-pk, calificacion, img_banner, id_direccion)
-	id -> DATOS_USUARIOS.id								cascada
-	id_direccion -> DIRECCION.id						null
+	id -> DATOS_USUARIOS.id
+	id_direccion -> DIRECCION.id
 
 PLAN (id-pk, nombre, descripcion, precio) 
 
 PLAN_USUARIO (id-pk, id_usuario, id_plan, estado, fecha_inicio, fecha_termino)
-	id_usuario -> DATOS_USUARIOS.id						cascada
-	id_plan -> PLAN.id									restringido
+	id_usuario -> DATOS_USUARIOS.id
+	id_plan -> PLAN.id
 
 DIRECCION (id-pk, departamento, ciudad, barrio, tipo_via, numero_via, numero_uno, numero_dos, observaciones)
 
 DIRECCION_USUARIO (id-pk, id_usuario, id_direccion)
-	id_direccion -> DIRECCION.id						cascada
-	id_usuario -> DATOS_USUARIOS.id						cascada
+	id_direccion -> DIRECCION.id
+	id_usuario -> DATOS_USUARIOS.id
 		
 METODO_PAGO (id-pk, nombre)
 
 DETALLES_METODO_PAGO (id-pk, id_usuario, id_metodo_pago, nombre, apellido, numero, expiracion, cvv)
-	id_usuario -> DATOS_USUARIOS.id						cascada
-	id_metodo_pago -> METODO_PAGO.id					restringido
+	id_usuario -> DATOS_USUARIOS.id
+	id_metodo_pago -> METODO_PAGO.id
 
 RESTABLECER_PASS (id-pk, token, expira)
-	id -> DATOS_USUARIOS.id								cascada
+	id -> DATOS_USUARIOS.id
 
 PEDIDO (id-pk, id_usuario, id_restaurante, id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, observaciones)
-	id_usuario -> DATOS_USUARIOS.id						null
-	id_restaurante -> RESTAURANTE.id					null
-	id_direccion -> DIRECCION.id						null
-	id_detalles_metodo_pago-> DETALLES_METODO_PAGO.id	null
+	id_usuario -> DATOS_USUARIOS.id
+	id_restaurante -> RESTAURANTE.id
+	id_direccion -> DIRECCION.id
+	id_detalles_metodo_pago-> DETALLES_METODO_PAGO.id
 	
 DETALLE_PEDIDO (id-pk, id_pedido, id_producto, costo_unit, cantidad_prod)
-	id_pedido -> PEDIDO.id								cascada
-	id_producto -> PRODUCTO.id							null
+	id_pedido -> PEDIDO.id
+	id_producto -> PRODUCTO.id
 	
 CALIFICACION_PEDIDO (id-pk, id_pedido, calificacion, comentarios)
-	id_pedido -> PEDIDO.id								cascada
+	id_pedido -> PEDIDO.id
 
 MENSAJE (id-pk, id_pedido, usuario_enviando, mensaje, fecha)
-	id_pedido -> PEDIDO.id								cascada
+	id_pedido -> PEDIDO.id
 
 CATEGORIA (id-pk, nombre)
 
 CATEGORIA_RES (id-pk, id_restaurante, id_categoria)
-	id_restaurante -> RESTAURANTE.id					cascada
-	id_categoria   -> CATEGORIA.id						cascada
+	id_restaurante -> RESTAURANTE.id
+	id_categoria   -> CATEGORIA.id
 	
 HORARIO (id-pk, id_restaurante, dia_semana, hora_apertura, hora_cierre)
-	id_restaurante -> RESTAURANTE.id					cascada
+	id_restaurante -> RESTAURANTE.id
 
 PRODUCTO(id-pk, id_restaurante, estado, nombre, descripcion, costo_unit, img_product)
-	id_restaurante -> RESTAURANTE.id					cascada
+	id_restaurante -> RESTAURANTE.id
 
 SECCION (id-pk, id_restaurante, nombre)
-	id_restaurante -> RESTAURANTE.id					cascada
+	id_restaurante -> RESTAURANTE.id
 
 SECCION_PROD (id-pk, id_producto, id_seccion)
-	id_producto  -> PRODUCTO.id							cascada
-	id_seccion -> SECCION.id							cascada
+	id_producto  -> PRODUCTO.id
+	id_seccion -> SECCION.id
 
 CARRITO (id-pk, id_usuario, id_producto, cantidad_prod)
-	id_usuario -> USUARIO.id							cascada
-	id_producto -> PRODUCTO.id							cascada
+	id_usuario -> USUARIO.id
+	id_producto -> PRODUCTO.id
 
 
 
