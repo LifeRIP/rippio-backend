@@ -214,4 +214,56 @@ async function modify_address(req, res) {
   }
 }
 
-module.exports = { change_data, change_password, add_address, modify_address};
+async function modify_profile_image(req, res) {
+  try {
+    // Obtener el id del usuario despues de pasar por el middleware de autenticacion
+    const { id } = req.user;
+
+    const { image } = req.body;
+
+    // Validar que los campos no estén vacíos
+
+    if (!image) {
+      return res.status(400).json({ message: 'Faltan campos por llenar' });
+    }
+
+    // Actualiza imagen de perfil en la base de datos
+    await pool.query(
+      'UPDATE datos_usuarios SET img_icon = $1 WHERE id = $2',
+      [image, id]
+    );
+    res.json({ message: 'La imagen de perfil se modificó exitosamente' });
+  } catch (e) {
+    res
+      .status(500)
+      .json({ message: 'Ha ocurrido un error al modificar la imagen de perfil' });
+  }
+}
+
+async function modify_banner_restaurant(req, res) {
+  try {
+    // Obtener el id del restaurante despues de pasar por el middleware de autenticacion
+    const { id } = req.user;
+
+    const { image } = req.body;
+
+    // Validar que los campos no estén vacíos
+
+    if (!image) {
+      return res.status(400).json({ message: 'Faltan campos por llenar' });
+    }
+
+    // Actualiza imagen de banner en la base de datos
+    await pool.query(
+      'UPDATE restaurante SET img_banner = $1 WHERE id = $2',
+      [image, id]
+    );
+    res.json({ message: 'La imagen de banner se modificó exitosamente' });
+  } catch (e) {
+    res
+      .status(500)
+      .json({ message: 'Ha ocurrido un error al modificar la imagen de banner' });
+  }
+}
+
+module.exports = { change_data, change_password, add_address, modify_address,modify_profile_image,modify_banner_restaurant};
