@@ -7,7 +7,9 @@ const {
   add_address,
   modify_address,
   modify_profile_image,
-  modify_banner_restaurant
+  modify_banner_restaurant,
+  add_payment_method,
+  modify_payment_method
 } = require('../controllers/edit.profile.controller');
 
 router.post('/edit', auth_user, change_data); // /api/profile/edit
@@ -16,4 +18,6 @@ router.post('/add_address', auth_user, add_address); // /api/profile/add_address
 router.post('/modify_address', auth_user, modify_address); // /api/profile/modify_address
 router.post('/modify_profile_image', auth_user, modify_profile_image); // /api/profile/modify_profile_image
 router.post('/modify_banner_restaurant', auth_user, modify_banner_restaurant); // /api/profile/modify_banner_restaurant
+router.post('/add_payment_method', auth_user, add_payment_method); // /api/profile/add_payment_method
+router.post('/modify_payment_method', auth_user, modify_payment_method); // /api/profile/modify_payment_method
 module.exports = router;
