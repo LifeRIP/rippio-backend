@@ -1,5 +1,5 @@
 const express = require('express');
-const  router  = require('./app/routes/index');
+const { router } = require('./app/routes/index');
 const path = require('path');
 const cors = require('cors');
 
@@ -18,6 +18,7 @@ const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
       'http://localhost:4000',
+      'https://rippio-api.vercel.app',
       'http://localhost:5173',
       'https://rippio.netlify.app',
     ];
