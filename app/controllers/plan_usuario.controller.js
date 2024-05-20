@@ -4,9 +4,9 @@ const { pool } = require('../database/dbConfig');
 
 
 async function getPlan(req, res) {
-
+  try {
     const {id_plan} = req.body;
-    const id_usuario = req.user.id;
+    const {id_usuario} = req.user;
     
 
     const fecha_inicio = new Date(); //toma la fecha en tiempo real
@@ -14,11 +14,11 @@ async function getPlan(req, res) {
     fecha_termino.setUTCFullYear(fecha_inicio.getUTCFullYear() + 1); //le suma 1 año a la fecha de inicio
     const estado = true;
 
-try {
     const existe = await pool.query(
         `SELECT * FROM plan_usuario WHERE id_usuario = $1`,
         [id_usuario]
     );
+    
      //validar si el usuario ya existe en la tabla plan_usuario, si es así, loa actualzia
     if (existe.rows.length > 0) {
         const response = await pool.query(
@@ -29,11 +29,12 @@ try {
 
     }else{
     //si da false el if, se inserta un nuevo registro
-      const response = await pool.query(
+       await pool.query(
         `INSERT INTO plan_usuario (id_usuario, id_plan, estado, fecha_inicio, fecha_termino)
         VALUES ($1, $2, $3, $4, $5) `,
         [id_usuario, id_plan, estado, fecha_inicio, fecha_termino]
       );}
+      res.json({ message: 'Membresía elegida correctamente' });
      
     }catch (error) {
         console.error(error); // Imprime el error en la consola

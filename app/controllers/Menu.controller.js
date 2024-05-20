@@ -1,16 +1,18 @@
 const { pool } = require('../database/dbConfig');
 
 async function AggMenu(req, res) { // Agregar un menú a un restaurante en la base de datos
-    
-    const id_usuario = req.user.id;
-    
-    const tipo_usuario = req.user.tipo_usuario;
-
     try {
+
+        const { id } = req.user;
+        
+        //obtiene el tipo de usuario
+        const tipo_usuario = await pool.query('SELECT tipo_usuario FROM datos_usuarios WHERE id = $1', [id]);
+        const valtipo_usuario = tipo_usuario.rows[0].tipo_usuario;
+
         //comprueba si el usuario es un admin
-        console.log(tipo_usuario);
-        if (tipo_usuario === 2) {
-            
+        
+        if (valtipo_usuario === 2) {
+            //si es admin, verifica si el restaurante existe
             const { id_restaurante } = req.body;
 
                 let restaurante;
@@ -20,7 +22,7 @@ async function AggMenu(req, res) { // Agregar un menú a un restaurante en la ba
                 
             } else {
                     restaurante = await pool.query(
-                    `SELECT * FROM producto WHERE id_restaurante = $1`,
+                    'SELECT * FROM producto WHERE id_restaurante = $1',
                     [id_restaurante]
                 );
             }
@@ -29,22 +31,22 @@ async function AggMenu(req, res) { // Agregar un menú a un restaurante en la ba
                 return res.status(400).json({ error: 'El restaurante no existe' });
                 
             } else {
-                const {id_restaurante, estado, nombre, descripcion, cost_unit} = req.body;
+                const {id_restaurante, estado, nombre, descripcion, cost_unit, img_product} = req.body;
                 response = await pool.query(
-                `INSERT INTO producto ( id_restaurante, estado, nombre, descripcion, cost_unit)
-                VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-                 [id_restaurante, estado, nombre, descripcion, cost_unit]
+                `INSERT INTO producto ( id_restaurante, estado, nombre, descripcion, cost_unit, img_product)
+                VALUES ($1, $2, $3, $4, $5 ,$6) RETURNING *`,
+                 [id_restaurante, estado, nombre, descripcion, cost_unit,img_product]
                 );
             }
             
             res.json({ message: 'Menu agregado correctamente', response:response.rows[0] });
-        } else if (tipo_usuario === 3) {
+        } else if (valtipo_usuario === 3) {
             //si es usuario no es admin, verifica si es el propio restaurante
-                const { estado, nombre, descripcion, cost_unit } = req.body;
+                const { estado, nombre, descripcion, cost_unit, img_product} = req.body;
                 const response = await pool.query(
-                `INSERT INTO producto (id_restaurante, estado, nombre, descripcion, cost_unit)
-                VALUES ($1, $2, $3, $4) RETURNING *`,
-                [id_restaurante, estado, nombre, descripcion, cost_unit]
+                `INSERT INTO producto (id_restaurante, estado, nombre, descripcion, cost_unit, img_product)
+                VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+                [id , estado, nombre, descripcion, cost_unit, img_product]
             );
             res.json({ message: 'Menu agregado correctamente', response: response.rows[0] });
         } else {
