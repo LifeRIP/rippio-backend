@@ -102,7 +102,6 @@ async function login(req, res) {
         .status(401)
         .send({ status: 'Error', message: 'Error de inicio de sesion' });
     }
-    console.log("mi culo");
 
     // Validar la contraseña
     const PasswordValid = await bcrypt.compare(
