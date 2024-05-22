@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const { pool } = require('../database/dbConfig');
-const jsonwebtoken = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 async function register(req, res) {
   try {
@@ -73,8 +73,33 @@ async function register(req, res) {
       ]
     );
 
-    res.status(201).json({ message: 'Usuario registrado exitosamente' });
+    // Crear token
+    const token = await jwt.sign(
+      {
+        id,
+        tipo_usuario,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '30d', // 30 dias
+      }
+    );
+
+    const cookieOption = {
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 dias
+      path: '/',
+    };
+
+    res.cookie('JWT', token, cookieOption);
+    res.status(201).json({
+      id,
+      nombre,
+      apellido,
+      email,
+      tipo_usuario,
+    });
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ message: 'Ha ocurrido un error al registrar el usuario' });
@@ -112,26 +137,33 @@ async function login(req, res) {
       return res.status(401).send({ message: 'Contraseña Incorrecta' });
     }
 
-    //TODO: Crear token de autenticación
-
-    const token = jsonwebtoken.sign(
+    // Crear token
+    const token = await jwt.sign(
       {
         userID: user.rows[0].id,
+        tipo_usuario: user.rows[0].tipo_usuario,
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '30d', // 30 dias
+      }
     );
 
     const cookieOption = {
-      expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 dias
       path: '/',
     };
 
     res.cookie('JWT', token, cookieOption);
     res.json({
-      status: 'ok',
-      message: 'Usuario loggeado' /*,redirect: "https://rippio.netlify.app/"*/,
+      id: user.rows[0].id,
+      nombre: user.rows[0].nombre,
+      apellido: user.rows[0].apellido,
+      email: user.rows[0].email,
+      tipo_usuario: user.rows[0].tipo_usuario,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Ha ocurrido un error al iniciar sesion' });
   }
 }
