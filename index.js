@@ -29,6 +29,7 @@ const corsOptions = {
       callback(new Error('Origin not allowed'), false);
     }
   },
+  credentials: true
 };
 
 app.use(cors(corsOptions));
