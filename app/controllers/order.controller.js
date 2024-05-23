@@ -10,7 +10,7 @@ async function getByUserID(req, res) {
       p.costo_total,
       p.estado,
       p.fecha,
-      p.observacion
+      p.observacion,
       json_agg(
           json_build_object(
               'nombre', prod.nombre,
