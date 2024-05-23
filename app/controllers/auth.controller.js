@@ -51,6 +51,18 @@ async function register(req, res) {
         .json({ message: 'La identificación ya está registrada' });
     }
 
+    // Validar que el telefono no esté vinculado a otra cuenta
+    const telefonoExist = await pool.query(
+      'SELECT * FROM datos_usuarios WHERE telefono = $1',
+      [telefono]
+    );
+
+    if (telefonoExist.rows.length > 0) {
+      return res
+        .status(400)
+        .json({ message: 'El numero de telefono ya está en uso' });
+    }
+
     // Crear un id único para el usuario
     const id = uuidv4();
 
