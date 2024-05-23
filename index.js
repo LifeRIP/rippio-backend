@@ -2,6 +2,7 @@ const express = require('express');
 const { router } = require('./app/routes/index');
 const path = require('path');
 const cors = require('cors');
+const helmet = require('helmet');
 
 // Server
 const app = express();
@@ -12,6 +13,7 @@ console.log(`Servidor corriendo en http://localhost:${port}/`);
 // Configuracion
 app.use(express.static(path.join(__dirname, '/app/public'))); // Rutas de prueba
 app.use(express.json()); // Para que express pueda entender los datos que vienen del cliente
+app.use(helmet()); // Seguridad
 
 // Cors
 const corsOptions = {
