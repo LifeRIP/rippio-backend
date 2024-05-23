@@ -10,7 +10,7 @@ async function getAll(req, res) {
   } catch (error) {
     res
       .status(500)
-      .json({ error: 'Ha ocurrido un error al obtener los planes' });
+      .json({ error: 'Ha ocurrido un error al obtener los usuarios' });
   }
 }
 
@@ -32,7 +32,7 @@ async function getById(req, res) {
   } catch (error) {
     res
       .status(500)
-      .json({ error: 'Ha ocurrido un error al obtener los planes' });
+      .json({ error: 'Ha ocurrido un error al obtener el usuario' });
   }
 }
 

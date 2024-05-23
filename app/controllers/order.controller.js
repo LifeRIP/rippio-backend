@@ -9,6 +9,8 @@ async function getByUserID(req, res) {
       r.nombre,
       p.costo_total,
       p.estado,
+      p.fecha,
+      p.observacion
       json_agg(
           json_build_object(
               'nombre', prod.nombre,
@@ -20,7 +22,7 @@ async function getByUserID(req, res) {
       JOIN detalle_pedido dp ON p.id = dp.id_pedido
       JOIN producto prod ON dp.id_producto = prod.id
       WHERE p.id_usuario = $1
-      GROUP BY p.id, r.nombre, p.costo_total, p.estado`,
+      GROUP BY p.id, r.nombre, p.costo_total, p.estado, p.fecha, p.observacion`,
       [id]
     );
 
