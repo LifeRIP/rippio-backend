@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const { pool } = require('../database/dbConfig');
 const jwt = require('jsonwebtoken');
+const expiresIn = 30 * 24 * 60 * 60; // Expiracion del token en segundos (30 dias)
 
 async function register(req, res) {
   try {
@@ -19,7 +20,7 @@ async function register(req, res) {
     if (
       !identificacion ||
       !nombre ||
-      !apellido ||
+      (tipo_usuario != 3 && !apellido) ||
       !email ||
       !telefono ||
       !password ||
@@ -81,22 +82,13 @@ async function register(req, res) {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: '30d', // 30 dias
+        expiresIn: expiresIn, // 30 dias en segundos
       }
     );
 
-    const cookieOption = {
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 dias
-      path: '/',
-    };
-
-    res.cookie('JWT', token, cookieOption);
     res.status(201).json({
+      token,
       id,
-      nombre,
-      apellido,
-      email,
-      tipo_usuario,
     });
   } catch (error) {
     console.error(error);
@@ -145,22 +137,24 @@ async function login(req, res) {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: '30d', // 30 dias
+        expiresIn: expiresIn, // 30 dias en segundos
       }
     );
-
+    /* 
+    // Opciones de la cookie
     const cookieOption = {
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 dias
+      httpOnly: true,
+      expires: new Date(Date.now() + expiresIn * 1000), // 30 dias en milisegundos
       path: '/',
+      sameSite: 'none',
+      secure: true,
     };
 
-    res.cookie('JWT', token, cookieOption);
+    // Enviar cookie
+    res.cookie('JWT', token, cookieOption); */
     res.json({
+      token,
       id: user.rows[0].id,
-      nombre: user.rows[0].nombre,
-      apellido: user.rows[0].apellido,
-      email: user.rows[0].email,
-      tipo_usuario: user.rows[0].tipo_usuario,
     });
   } catch (error) {
     console.error(error);
