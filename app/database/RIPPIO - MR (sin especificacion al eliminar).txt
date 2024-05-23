@@ -1,4 +1,4 @@
-DATOS_USUARIOS (id-pk, identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon, estado)
+DATOS_USUARIOS (id-pk, identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon, estado, creditos)
 	tipo_usuario -> ROL.id
 
 ROL (id-pk, rol)
