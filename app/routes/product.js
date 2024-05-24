@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth.user.middleware');
+const auth_user = require('../middleware/auth.user.middleware');
 const {
   getByResID,
   getByResProd,
@@ -10,7 +10,7 @@ const {
 
 router.get('/getByResID/:id', getByResID); // /api/product/getByResID/:id
 router.get('/getByResProd/:id', getByResProd); // /api/product/getByResProd/:id
-router.post('/add', auth, add); // /api/product/add
-router.post('/updateState', auth, updateState); // /api/product/updateState
+router.post('/add', auth_user, add); // /api/product/add
+router.post('/updateState', auth_user, updateState); // /api/product/updateState
 
 module.exports = router;
