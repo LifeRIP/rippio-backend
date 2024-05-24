@@ -1,4 +1,6 @@
 const { pool } = require('../database/dbConfig');
+const moment = require('moment');
+moment.locale('es');
 
 async function getByUserID(req, res) {
   try {
@@ -31,6 +33,13 @@ async function getByUserID(req, res) {
         .status(404)
         .json({ error: 'No se encontraron pedidos para el usuario' });
     }
+
+    response.rows.forEach((row) => {
+      let fechaFormateada = moment(row.fecha).format('MMM D, YYYY h:mm A');
+      row.fecha = fechaFormateada =
+        fechaFormateada.charAt(0).toUpperCase() +
+        fechaFormateada.slice(1).replace('.', '');
+    });
 
     res.json(response.rows);
   } catch (error) {
