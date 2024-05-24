@@ -72,7 +72,7 @@ async function register(req, res) {
 
     // Insertar el usuario en la base de datos
     await pool.query(
-      'INSERT INTO datos_usuarios (id, identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+      'INSERT INTO datos_usuarios (id, identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon, estado, creditos) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
       [
         id,
         identificacion,
@@ -83,6 +83,8 @@ async function register(req, res) {
         hash,
         tipo_usuario,
         'https://firebasestorage.googleapis.com/v0/b/rippio.appspot.com/o/RestaurantIcon%2FDefaultUserIcon.jpg?alt=media&token=ffb4eaaf-b8e4-42b6-829e-d0398410d95f',
+        true,
+        0,
       ]
     );
 

@@ -12,7 +12,7 @@ async function getByUserID(req, res) {
       p.costo_total,
       p.estado,
       p.fecha,
-      p.observacion,
+      p.observaciones,
       json_agg(
           json_build_object(
               'nombre', prod.nombre,
@@ -24,7 +24,9 @@ async function getByUserID(req, res) {
       JOIN detalle_pedido dp ON p.id = dp.id_pedido
       JOIN producto prod ON dp.id_producto = prod.id
       WHERE p.id_usuario = $1
-      GROUP BY p.id, r.nombre, p.costo_total, p.estado, p.fecha, p.observacion`,
+      GROUP BY p.id, r.nombre, p.costo_total, p.estado, p.fecha, p.observaciones
+      ORDER BY p.fecha DESC
+      LIMIT 10`,
       [id]
     );
 
@@ -43,6 +45,7 @@ async function getByUserID(req, res) {
 
     res.json(response.rows);
   } catch (error) {
+    console.error(error.message);
     res
       .status(500)
       .json({ error: 'Ha ocurrido un error al obtener los pedidos' });
