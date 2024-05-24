@@ -2,6 +2,8 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.POSTGRES_URL,
+  // Intenta reconectar en caso de pérdida de conexión
+  reconnect: true,
 });
 
 pool.connect((err) => {
