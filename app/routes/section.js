@@ -2,15 +2,15 @@ const express = require('express');
 const auth_user = require('../middleware/auth.user.middleware');
 const router = express.Router();
 const {
-    AggSect,
-    DelSect,
-    ModSect,
-    getSectionsByRestaurantId
+  add,
+  remove,
+  update,
+  getByResId,
 } = require('../controllers/section.controller');
 
-router.post('/AggSect', auth_user, AggSect); // /api/section/AggSect
-router.post('/DelSect', auth_user, DelSect); // /api/section/DelSect
-router.post('/ModSect', auth_user, ModSect); // /api/section/ModSect
-router.get('/getSectionsByRestaurantId', auth_user, getSectionsByRestaurantId); // /api/section/getSectionsByRestaurantId
+router.post('/add', auth_user, add); // /api/section/add
+router.post('/delete', auth_user, remove); // /api/section/remove
+router.post('/update', auth_user, update); // /api/section/update
+router.get('/getByResId', auth_user, getByResId); // /api/section/getByResId
 
 module.exports = router;
