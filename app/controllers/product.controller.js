@@ -56,7 +56,7 @@ async function getByResProd(req, res) {
   }
 }
 
-async function AggMenu(req, res) { // Agregar un menú a un restaurante en la base de datos
+async function AggProd(req, res) { // Agregar un menú a un restaurante en la base de datos
   try {
 
       const { id } = req.user;
@@ -114,7 +114,7 @@ async function AggMenu(req, res) { // Agregar un menú a un restaurante en la ba
   }
 }
 
-async function InhabMenu(req, res) { // Inhabilitar y habilitar un producto a un restaurante en la base de datos
+async function InhabProd(req, res) { // Inhabilitar y habilitar un producto a un restaurante en la base de datos
   
   const id_restaurante = req.user.id;
   
@@ -167,5 +167,4 @@ async function InhabMenu(req, res) { // Inhabilitar y habilitar un producto a un
   }
 }
 
-module.exports = { AggMenu,InhabMenu};
-module.exports = { getByResID, getByResProd };
+module.exports = { getByResID, getByResProd,AggProd,InhabProd };
