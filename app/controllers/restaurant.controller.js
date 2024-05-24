@@ -81,29 +81,30 @@ async function getRestaurantInfoById(req, res) {
       .json({ error: 'Ha ocurrido un error al obtener el restaurante' });
   }
 }
-
-async function getCategoriesAndProductsByRestaurantId(req, res) {
+async function getAllProductsInSectionsByRestaurantId(req, res) {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const response = await pool.query(
-      `select p.id, p.nombre, p.descripcion, p.cost_unit, p.img_product, p.estado,
-      c.nombre as categoria_nombre
-      from producto p
-      inner join restaurante r on r.id = p.id_restaurante
-      inner join categoria_prod cp on cp.id_producto = p.id
-      inner join categoria c on cp.id_categoria = c.id
-      where r.id=$1`, [id]
+      `SELECT 
+          p.nombre, p.estado, p.descripcion, p.cost_unit, p.img_product,
+          sp.id_seccion, sp.id_producto,
+          s.nombre as sect_nombre
+          From producto p
+              inner join seccion_prod sp on p.id = sp.id_producto
+              inner join seccion s on s.id = sp.id_seccion
+          where s.id_restaurante=$1`,
+      [id]
     );
-
     const rows = response.rows;
-    const categories = [];
+    const sections = [];
     for (let row of rows) {
-      const category = categories.find(c => c.nombre === row.categoria_nombre);
-      if (!category) {
-        categories.push({
-          nombre: row.categoria_nombre,
+      const section = sections.find(s => s.id === row.id_seccion);
+      if (!section) {
+        sections.push({
+          id: row.id_seccion,
+          nombre: row.sect_nombre,
           productos: [{
-            id: row.id,
+            id: row.id_producto,
             nombre: row.nombre,
             descripcion: row.descripcion,
             costo_unit: row.cost_unit,
@@ -113,8 +114,8 @@ async function getCategoriesAndProductsByRestaurantId(req, res) {
         });
       }
       else {
-        category.productos.push({
-          id: row.id,
+        section.productos.push({
+          id: row.id_producto,
           nombre: row.nombre,
           descripcion: row.descripcion,
           costo_unit: row.cost_unit,
@@ -123,13 +124,11 @@ async function getCategoriesAndProductsByRestaurantId(req, res) {
         });
       }
     }
-    res.json(categories);
-  }
-  catch (error) {
-    res
-      .status(500)
-      .json({ error: 'Ha ocurrido un error al obtener las categorías y productos' });
+    res.status(200).json(sections);
+  }catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ha ocurrido un error al obtener los productos' });
   }
 }
 
-module.exports = { getAll, getTopByCity, getRestaurantInfoById, getCategoriesAndProductsByRestaurantId };
+module.exports = { getAll, getTopByCity, getRestaurantInfoById, getAllProductsInSectionsByRestaurantId };
