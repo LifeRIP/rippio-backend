@@ -3,13 +3,13 @@ const router = express.Router();
 const {
   getAll,
   getTopByCity,
-  getRestaurantInfoById,
-  getAllProductsInSectionsByRestaurantId
+  getById,
+  getCatAndProdByResId,
 } = require('../controllers/restaurant.controller');
 
 router.get('/getAll', getAll); // /api/restaurant/getAll
 router.get('/getTopByCity', getTopByCity); // /api/restaurant/getTopByCity
-router.get('/getRestaurantInfoById/:id', getRestaurantInfoById); // /api/restaurant/getRestaurantInfoById
-router.get('/getCategoriesAndProductsByRestaurantId/:id', getAllProductsInSectionsByRestaurantId); // /api/restaurant/getCategoriesAndProductsByRestaurantId
+router.get('/getById/:id', getById); // /api/restaurant/getById
+router.get('/getCatAndProdByResId/:id', getCatAndProdByResId); // /api/restaurant/getCatAndProdByResId
 
 module.exports = router;

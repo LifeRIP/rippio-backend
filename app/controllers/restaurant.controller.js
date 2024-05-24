@@ -38,7 +38,7 @@ async function getTopByCity(req, res) {
   }
 }
 
-async function getRestaurantInfoById(req, res) {
+async function getById(req, res) {
   try {
     const id = req.params.id;
     const response = await pool.query(
@@ -51,7 +51,8 @@ async function getRestaurantInfoById(req, res) {
       inner join direccion_restaurante dr on r.id = dr.id_restaurante
       inner join direccion d on dr.id_direccion = d.id
       inner join horario h on r.id = h.id_restaurante
-      WHERE r.id = $1`, [id]
+      WHERE r.id = $1`,
+      [id]
     );
 
     const rows = response.rows;
@@ -62,26 +63,25 @@ async function getRestaurantInfoById(req, res) {
       img_icon: rows[0].img_icon,
       direccion: `${rows[0].tipo_via} ${rows[0].numero_via} #${rows[0].numero_uno} ${rows[0].numero_dos} ${rows[0].barrio}`,
       calificacion: rows[0].calificacion,
-      horario: []
+      horario: [],
     };
 
     for (let row of rows) {
       restaurant.horario.push({
         day: row.dia_semana,
         open: row.hora_apertura,
-        close: row.hora_cierre
+        close: row.hora_cierre,
       });
     }
 
     res.json(restaurant);
-  }
-  catch (error) {
+  } catch (error) {
     res
       .status(500)
       .json({ error: 'Ha ocurrido un error al obtener el restaurante' });
   }
 }
-async function getAllProductsInSectionsByRestaurantId(req, res) {
+async function getCatAndProdByResId(req, res) {
   try {
     const { id } = req.params;
     const response = await pool.query(
@@ -98,37 +98,45 @@ async function getAllProductsInSectionsByRestaurantId(req, res) {
     const rows = response.rows;
     const sections = [];
     for (let row of rows) {
-      const section = sections.find(s => s.id === row.id_seccion);
+      const section = sections.find((s) => s.id === row.id_seccion);
       if (!section) {
         sections.push({
           id: row.id_seccion,
           nombre: row.sect_nombre,
-          productos: [{
-            id: row.id_producto,
-            nombre: row.nombre,
-            descripcion: row.descripcion,
-            costo_unit: row.cost_unit,
-            img_product: row.img_product,
-            estado: row.estado
-          }]
+          productos: [
+            {
+              id: row.id_producto,
+              nombre: row.nombre,
+              descripcion: row.descripcion,
+              costo_unit: row.cost_unit,
+              img_product: row.img_product,
+              estado: row.estado,
+            },
+          ],
         });
-      }
-      else {
+      } else {
         section.productos.push({
           id: row.id_producto,
           nombre: row.nombre,
           descripcion: row.descripcion,
           costo_unit: row.cost_unit,
           img_product: row.img_product,
-          estado: row.estado
+          estado: row.estado,
         });
       }
     }
     res.status(200).json(sections);
-  }catch (error) {
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Ha ocurrido un error al obtener los productos' });
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los productos' });
   }
 }
 
-module.exports = { getAll, getTopByCity, getRestaurantInfoById, getAllProductsInSectionsByRestaurantId };
+module.exports = {
+  getAll,
+  getTopByCity,
+  getById,
+  getCatAndProdByResId,
+};

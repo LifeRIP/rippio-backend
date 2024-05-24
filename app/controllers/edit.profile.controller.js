@@ -13,10 +13,10 @@ async function change_data(req, res) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
 
-    // Validar que el telefono no esté vinculado a otra cuenta
+    // Validar que el telefono no esté vinculado a otra cuenta, excluyendo al usuario actual
     const telefonoExist = await pool.query(
-      'SELECT * FROM datos_usuarios WHERE telefono = $1',
-      [telefono]
+      'SELECT * FROM datos_usuarios WHERE telefono = $1 AND id != $2',
+      [telefono, id]
     );
 
     if (telefonoExist.rows.length > 0) {
@@ -34,6 +34,7 @@ async function change_data(req, res) {
 
     res.json({ message: 'Actualizacion de datos exitosa' });
   } catch (e) {
+    console.error(e.message);
     res
       .status(500)
       .json({ message: 'Ha ocurrido un error al modificar los datos' });
@@ -198,7 +199,9 @@ async function modify_address(req, res) {
     );
 
     if (address.rows.length === 0) {
-      return res.status(400).json({ message: 'La direccion no pertenece al usuario' });
+      return res
+        .status(400)
+        .json({ message: 'La direccion no pertenece al usuario' });
     }
 
     // Validar que la direccion exista
@@ -210,7 +213,6 @@ async function modify_address(req, res) {
     if (addressExist.rows.length === 0) {
       return res.status(400).json({ message: 'La direccion no existe' });
     }
-
 
     // Actualiza direccion en la base de datos
     await pool.query(
@@ -224,7 +226,7 @@ async function modify_address(req, res) {
         numero_uno,
         numero_dos,
         observaciones,
-        id_direccion
+        id_direccion,
       ]
     );
     res.json({ message: 'La direccion se modificó exitosamente' });
@@ -249,15 +251,15 @@ async function modify_profile_image(req, res) {
     }
 
     // Actualiza imagen de perfil en la base de datos
-    await pool.query(
-      'UPDATE datos_usuarios SET img_icon = $1 WHERE id = $2',
-      [image, id]
-    );
+    await pool.query('UPDATE datos_usuarios SET img_icon = $1 WHERE id = $2', [
+      image,
+      id,
+    ]);
     res.json({ message: 'La imagen de perfil se modificó exitosamente' });
   } catch (e) {
-    res
-      .status(500)
-      .json({ message: 'Ha ocurrido un error al modificar la imagen de perfil' });
+    res.status(500).json({
+      message: 'Ha ocurrido un error al modificar la imagen de perfil',
+    });
   }
 }
 
@@ -275,32 +277,41 @@ async function modify_banner_restaurant(req, res) {
     }
 
     // Actualiza imagen de banner en la base de datos
-    await pool.query(
-      'UPDATE restaurante SET img_banner = $1 WHERE id = $2',
-      [image, id]
-    );
+    await pool.query('UPDATE restaurante SET img_banner = $1 WHERE id = $2', [
+      image,
+      id,
+    ]);
     res.json({ message: 'La imagen de banner se modificó exitosamente' });
   } catch (e) {
-    res
-      .status(500)
-      .json({ message: 'Ha ocurrido un error al modificar la imagen de banner' });
+    res.status(500).json({
+      message: 'Ha ocurrido un error al modificar la imagen de banner',
+    });
   }
 }
 
-async function add_payment_method (req, res) {
+async function add_payment_method(req, res) {
   try {
     // Obtener el id del usuario despues de pasar por el middleware de autenticacion
     const { id } = req.user;
 
-    const { tipo_tarjeta, nombre, apellido, numero_tarjeta, fecha_vencimiento, cvv } = req.body;
+    const {
+      tipo_tarjeta,
+      nombre,
+      apellido,
+      numero_tarjeta,
+      fecha_vencimiento,
+      cvv,
+    } = req.body;
 
     // Validar que los campos no estén vacíos
-    if (!tipo_tarjeta || 
-        !nombre || 
-        !apellido ||
-        !numero_tarjeta ||
-        !fecha_vencimiento ||
-        !cvv) {
+    if (
+      !tipo_tarjeta ||
+      !nombre ||
+      !apellido ||
+      !numero_tarjeta ||
+      !fecha_vencimiento ||
+      !cvv
+    ) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
 
@@ -321,19 +332,26 @@ async function add_payment_method (req, res) {
     const lastTwoDigits = currentYear.toString().slice(-2);
     const currentMonth = date.getMonth() + 1;
     const [expirationMonth, expirationYear] = fecha_vencimiento.split('/');
-    if (expirationYear < lastTwoDigits || (expirationYear == currentYear && expirationMonth < currentMonth)) {
+    if (
+      expirationYear < lastTwoDigits ||
+      (expirationYear == currentYear && expirationMonth < currentMonth)
+    ) {
       return res.status(400).json({ message: 'La tarjeta ha expirado' });
     }
 
     // Validar que el cvv sea un numero de 3 digitos
     if (cvv.length !== 3 || isNaN(cvv)) {
-      return res.status(400).json({ message: 'El cvv debe ser un numero de 3 digitos' });
+      return res
+        .status(400)
+        .json({ message: 'El cvv debe ser un numero de 3 digitos' });
     }
 
     // Validar que el numero de tarjeta tenga el formato correcto
     const cardNumber = numero_tarjeta.replace(/\s/g, '');
     if (cardNumber.length !== 16 || isNaN(cardNumber)) {
-      return res.status(400).json({ message: 'El numero de tarjeta debe tener 16 digitos' });
+      return res
+        .status(400)
+        .json({ message: 'El numero de tarjeta debe tener 16 digitos' });
     }
 
     const digitos = Array.from(cardNumber).map(Number);
@@ -346,42 +364,61 @@ async function add_payment_method (req, res) {
     const sum = digitos.reduce((acc, val) => acc + val, 0);
 
     if (sum % 10 !== 0) {
-      return res.status(400).json({ message: 'El numero de tarjeta es invalido' });
+      return res
+        .status(400)
+        .json({ message: 'El numero de tarjeta es invalido' });
     }
-  
+
     // Crear nueva tarjeta en la base de datos
-     await pool.query(
+    await pool.query(
       'INSERT INTO detalles_metodo_pago(id_usuario, id_metodo_pago, nombre, apellido, numero, expiracion, cvv) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-      [id, Id_tipoTarjeta.rows[0].id, nombre, apellido, cardNumber, fecha_vencimiento, cvv]
+      [
+        id,
+        Id_tipoTarjeta.rows[0].id,
+        nombre,
+        apellido,
+        cardNumber,
+        fecha_vencimiento,
+        cvv,
+      ]
     );
-    
+
     res.json({ message: 'Nueva tarjeta agregada exitosamente' });
-  
-}catch (e) {
+  } catch (e) {
     res
       .status(500)
       .json({ message: 'Ha ocurrido un error al agregar la tarjeta' });
   }
 }
 
-async function modify_payment_method (req, res) {
+async function modify_payment_method(req, res) {
   try {
     // Obtener el id del usuario despues de pasar por el middleware de autenticacion
     const { id } = req.user;
 
-    const { id_metodo_pago, tipo_tarjeta, nombre, apellido, numero_tarjeta, fecha_vencimiento, cvv } = req.body;
+    const {
+      id_metodo_pago,
+      tipo_tarjeta,
+      nombre,
+      apellido,
+      numero_tarjeta,
+      fecha_vencimiento,
+      cvv,
+    } = req.body;
 
     // Validar que los campos no estén vacíos
-    if (!id_metodo_pago ||
-        !tipo_tarjeta || 
-        !nombre || 
-        !apellido ||
-        !numero_tarjeta ||
-        !fecha_vencimiento ||
-        !cvv) {
+    if (
+      !id_metodo_pago ||
+      !tipo_tarjeta ||
+      !nombre ||
+      !apellido ||
+      !numero_tarjeta ||
+      !fecha_vencimiento ||
+      !cvv
+    ) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
-    
+
     // Validar que la tarjeta exista
     const cardExist = await pool.query(
       'SELECT * FROM detalles_metodo_pago WHERE id = $1',
@@ -391,18 +428,18 @@ async function modify_payment_method (req, res) {
     if (cardExist.rows.length === 0) {
       return res.status(400).json({ message: 'La tarjeta no existe' });
     }
-    
+
     // Conseguir Id del tipo de tarjeta
     const Id_tipoTarjeta = await pool.query(
       'SELECT * FROM metodo_pago WHERE nombre = $1',
       [tipo_tarjeta]
     );
-    
+
     // Validar que el tipo de tarjeta exista
     if (Id_tipoTarjeta.rows.length === 0) {
       return res.status(400).json({ message: 'El tipo de tarjeta no existe' });
     }
-    
+
     // Validar que la tarjeta pertenezca al usuario
     const card = await pool.query(
       'SELECT * FROM detalles_metodo_pago WHERE id_usuario = $1 AND id = $2',
@@ -410,10 +447,10 @@ async function modify_payment_method (req, res) {
     );
 
     if (card.rows.length === 0) {
-      return res.status(400).json({ message: 'La tarjeta no pertenece al usuario' });
+      return res
+        .status(400)
+        .json({ message: 'La tarjeta no pertenece al usuario' });
     }
-
-    
 
     // Validar que la fecha de vencimiento sea valida
     const date = new Date();
@@ -421,21 +458,28 @@ async function modify_payment_method (req, res) {
     const lastTwoDigits = currentYear.toString().slice(-2);
     const currentMonth = date.getMonth() + 1;
     const [expirationMonth, expirationYear] = fecha_vencimiento.split('/');
-    if (expirationYear < lastTwoDigits || (expirationYear == currentYear && expirationMonth < currentMonth)) {
+    if (
+      expirationYear < lastTwoDigits ||
+      (expirationYear == currentYear && expirationMonth < currentMonth)
+    ) {
       return res.status(400).json({ message: 'La tarjeta ha expirado' });
     }
 
     // Validar que el cvv sea un numero de 3 digitos
     if (cvv.length !== 3 || isNaN(cvv)) {
-      return res.status(400).json({ message: 'El cvv debe ser un numero de 3 digitos' });
+      return res
+        .status(400)
+        .json({ message: 'El cvv debe ser un numero de 3 digitos' });
     }
-    
+
     // Validar que el numero de tarjeta tenga el formato correcto
     const cardNumber = numero_tarjeta.replace(/\s/g, '');
     if (cardNumber.length !== 16 || isNaN(cardNumber)) {
-      return res.status(400).json({ message: 'El numero de tarjeta debe tener 16 digitos' });
+      return res
+        .status(400)
+        .json({ message: 'El numero de tarjeta debe tener 16 digitos' });
     }
-    
+
     const digitos = Array.from(cardNumber).map(Number);
 
     for (let i = digitos.length - 2; i >= 0; i -= 2) {
@@ -446,21 +490,39 @@ async function modify_payment_method (req, res) {
     const sum = digitos.reduce((acc, val) => acc + val, 0);
 
     if (sum % 10 !== 0) {
-      return res.status(400).json({ message: 'El numero de tarjeta es invalido' });
+      return res
+        .status(400)
+        .json({ message: 'El numero de tarjeta es invalido' });
     }
-    
+
     // Actualiza tarjeta en la base de datos
     await pool.query(
       'UPDATE detalles_metodo_pago SET id_metodo_pago=$1, nombre=$2, apellido=$3, numero=$4, expiracion=$5, cvv=$6 WHERE id = $7',
-      [Id_tipoTarjeta.rows[0].id, nombre, apellido, cardNumber, fecha_vencimiento, cvv, id_metodo_pago]
+      [
+        Id_tipoTarjeta.rows[0].id,
+        nombre,
+        apellido,
+        cardNumber,
+        fecha_vencimiento,
+        cvv,
+        id_metodo_pago,
+      ]
     );
     res.json({ message: 'La tarjeta se modificó exitosamente' });
-  }
-  catch (e) {
+  } catch (e) {
     res
       .status(500)
       .json({ message: 'Ha ocurrido un error al modificar la tarjeta' });
   }
 }
 
-module.exports = { change_data, change_password, add_address, modify_address,modify_profile_image,modify_banner_restaurant,add_payment_method,modify_payment_method};
+module.exports = {
+  change_data,
+  change_password,
+  add_address,
+  modify_address,
+  modify_profile_image,
+  modify_banner_restaurant,
+  add_payment_method,
+  modify_payment_method,
+};
