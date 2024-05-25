@@ -69,13 +69,14 @@ async function getCatAndProdByResId(req, res) {
     const { id } = req.params;
     const response = await pool.query(
       `SELECT 
-      p.nombre, p.estado, p.descripcion, p.cost_unit, p.img_product,
+      p.nombre, p.disponible, p.descripcion, p.cost_unit, p.img_product,
       s.id as id_seccion, sp.id_producto,
       s.nombre as sect_nombre
       FROM seccion s
       LEFT JOIN seccion_prod sp ON s.id = sp.id_seccion
       LEFT JOIN producto p ON p.id = sp.id_producto
-          where s.id_restaurante=$1`,
+      WHERE s.id_restaurante=$1
+      AND (p.estado IS NULL OR p.estado=true)`,
       [id]
     );
     const rows = response.rows;
@@ -94,7 +95,7 @@ async function getCatAndProdByResId(req, res) {
                   descripcion: row.descripcion,
                   costo_unit: row.cost_unit,
                   img_product: row.img_product,
-                  estado: row.estado,
+                  disponible: row.disponible,
                 },
               ]
             : [],
@@ -107,7 +108,7 @@ async function getCatAndProdByResId(req, res) {
             descripcion: row.descripcion,
             costo_unit: row.cost_unit,
             img_product: row.img_product,
-            estado: row.estado,
+            disponible: row.disponible,
           });
         }
       }
