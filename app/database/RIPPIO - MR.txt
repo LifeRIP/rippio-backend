@@ -52,7 +52,7 @@ PLAN_USUARIO (id-pk, id_usuario, id_plan, estado, fecha_inicio, fecha_termino)
 	id_usuario -> DATOS_USUARIOS.id						cascada
 	id_plan -> PLAN.id									restringido
 
-PRODUCTO (id-pk, id_restaurante, estado, nombre, descripcion, costo_unit, img_product)
+PRODUCTO (id-pk, id_restaurante, disponible, nombre, descripcion, costo_unit, img_product, estado)
 	id_restaurante -> RESTAURANTE.id					cascada
 
 RESTABLECER_PASS (id-pk, token, expira)
