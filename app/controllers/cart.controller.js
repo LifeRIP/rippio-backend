@@ -37,6 +37,12 @@ async function get(req, res) {
       'SELECT * FROM carrito WHERE id_usuario = $1',
       [id_usuario]
     );
+
+    // Verificar si el carrito tiene productos
+    if (cart.rowCount === 0) {
+      return res.status(404).json({ message: 'Carrito vacío' });
+    }
+
     res.json(cart.rows);
   } catch (error) {
     console.error(error.message);
@@ -44,14 +50,22 @@ async function get(req, res) {
   }
 }
 
-async function remove(req, res) {
+async function removeByProdId(req, res) {
   try {
-    const id_usuario = req.user.id;
-    const { id_producto } = req.params;
-    await pool.query(
+    const id_usuario = req.user.id; // ID del usuario autenticado
+    const id_producto = req.params.id_producto;
+    const result = await pool.query(
       'DELETE FROM carrito WHERE id_usuario = $1 AND id_producto = $2',
       [id_usuario, id_producto]
     );
+
+    // Verificar si el producto existe en el carrito
+    if (result.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ message: 'Producto no encontrado en el carrito' });
+    }
+
     res.json({ message: 'Producto eliminado del carrito' });
   } catch (error) {
     console.error(error.message);
@@ -62,12 +76,21 @@ async function remove(req, res) {
 async function empty(req, res) {
   try {
     const id_usuario = req.user.id;
-    await pool.query('DELETE FROM carrito WHERE id_usuario = $1', [id_usuario]);
-    res.json({ message: 'Carrito eliminado' });
+    const result = await pool.query(
+      'DELETE FROM carrito WHERE id_usuario = $1',
+      [id_usuario]
+    );
+
+    // Verificar si el carrito tiene productos
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Carrito vacío' });
+    }
+
+    res.json({ message: 'Carrito vaciado' });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: 'Error al eliminar carrito' });
   }
 }
 
-module.exports = { add, get, remove, empty };
+module.exports = { add, get, removeByProdId, empty };
