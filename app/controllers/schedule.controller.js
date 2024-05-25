@@ -5,7 +5,7 @@ const { pool } = require('../database/dbConfig');
 async function addSchedule(req, res) {
     try {  
         const { id } = req.user;
-
+        
         const {
             dias,
             hora_inicio,
@@ -20,17 +20,17 @@ async function addSchedule(req, res) {
         ) {
             return res.status(400).json({ error: 'Por favor complete todos los campos' });
         }
-
+        
         // Recursion para agregar horario
         
         for (let i = 0; i < dias.length; i++) {
             // Agregar el horario
             await pool.query(
-             'INSERT INTO horario (id_restaurante, dia, hora_inicio, hora_fin) VALUES ($1, $2, $3, $4)',
+             'INSERT INTO horario (id_restaurante, dia_semana, hora_apertura, hora_cierre) VALUES ($1, $2, $3, $4)',
              [id, dias[i], hora_inicio, hora_fin]
             );
         }
-
+        
         res.json({ message: 'Horario agregado correctamente' });
 
     } catch (error) {
@@ -77,8 +77,8 @@ async function updateSchedule(req, res) {
 
         for (let i = 0; i < dias.length; i++) {
             await pool.query(
-                `UPDATE horario SET dia = $1, hora_inicio = $2, hora_fin = $3 WHERE id_restaurante = $4 and dia = $5`,
-                [dias[i], hora_inicio, hora_fin, id, dias[i]]
+                `UPDATE horario SET hora_apertura = $1, hora_cierre = $2 WHERE id_restaurante = $3 and dia_semana = $4`,
+                [hora_inicio, hora_fin, id, dias[i]]
             );
         }
 
@@ -102,7 +102,7 @@ async function deleteSchedule(req, res) {
 
         // Eliminar el horario
         await pool.query(
-            `DELETE FROM horario WHERE id_restaurante = $1 and dia = $2`,
+            `DELETE FROM horario WHERE id_restaurante = $1 and dia_semana = $2`,
             [id, dia]
         );
 
