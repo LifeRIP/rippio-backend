@@ -86,51 +86,50 @@ async function getCatAndProdByResId(req, res) {
     const { id } = req.params;
     const response = await pool.query(
       `SELECT 
-          p.nombre, p.estado, p.descripcion, p.cost_unit, p.img_product,
-          sp.id_seccion, sp.id_producto,
-          s.nombre as sect_nombre
-          From producto p
-              inner join seccion_prod sp on p.id = sp.id_producto
-              inner join seccion s on s.id = sp.id_seccion
+      p.nombre, p.estado, p.descripcion, p.cost_unit, p.img_product,
+      s.id as id_seccion, sp.id_producto,
+      s.nombre as sect_nombre
+      FROM seccion s
+      LEFT JOIN seccion_prod sp ON s.id = sp.id_seccion
+      LEFT JOIN producto p ON p.id = sp.id_producto
           where s.id_restaurante=$1`,
       [id]
     );
     const rows = response.rows;
     const sections = [];
     for (let row of rows) {
-      const section = sections.find((s) => s.id === row.id_seccion);
+      const section = sections.find(s => s.id === row.id_seccion);
       if (!section) {
         sections.push({
           id: row.id_seccion,
           nombre: row.sect_nombre,
-          productos: [
-            {
-              id: row.id_producto,
-              nombre: row.nombre,
-              descripcion: row.descripcion,
-              costo_unit: row.cost_unit,
-              img_product: row.img_product,
-              estado: row.estado,
-            },
-          ],
+          productos: row.id_producto ? [{
+            id: row.id_producto,
+            nombre: row.nombre,
+            descripcion: row.descripcion,
+            costo_unit: row.cost_unit,
+            img_product: row.img_product,
+            estado: row.estado
+          }] : []
         });
-      } else {
-        section.productos.push({
-          id: row.id_producto,
-          nombre: row.nombre,
-          descripcion: row.descripcion,
-          costo_unit: row.cost_unit,
-          img_product: row.img_product,
-          estado: row.estado,
-        });
+      }
+      else {
+        if (row.id_producto) {
+          section.productos.push({
+            id: row.id_producto,
+            nombre: row.nombre,
+            descripcion: row.descripcion,
+            costo_unit: row.cost_unit,
+            img_product: row.img_product,
+            estado: row.estado
+          });
+        }
       }
     }
     res.status(200).json(sections);
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ error: 'Ha ocurrido un error al obtener los productos' });
+    res.status(500).json({ error: 'Ha ocurrido un error al obtener los productos' });
   }
 }
 
