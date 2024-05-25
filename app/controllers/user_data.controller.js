@@ -14,6 +14,24 @@ async function getAll(req, res) {
   }
 }
 
+async function getAllByRol(req, res) {
+  try {
+    const tipo_usuario = req.params.tipo_usuario;
+    const response = await pool.query(
+      `SELECT * 
+      FROM datos_usuarios 
+      WHERE tipo_usuario = $1`,
+      [tipo_usuario]
+    );
+    res.json(response.rows);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los usuarios' });
+  }
+}
+
 async function getById(req, res) {
   try {
     const id = req.params.id;
@@ -38,4 +56,4 @@ async function getById(req, res) {
   }
 }
 
-module.exports = { getAll, getById };
+module.exports = { getAll, getById, getAllByRol };

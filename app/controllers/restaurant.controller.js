@@ -1,29 +1,12 @@
 const { pool } = require('../database/dbConfig');
 
-async function getAll(req, res) {
-  try {
-    //TODO: si se quita el atributo tipo_usuario, hacer join de restaurantes y datos_usuarios
-    const response = await pool.query(
-      `SELECT * 
-      FROM datos_usuarios 
-      WHERE tipo_usuario = 3`
-    );
-    res.json(response.rows);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: 'Ha ocurrido un error al obtener los restaurantes' });
-  }
-}
-
 async function getTopByCity(req, res) {
   try {
     const ciudad = req.query.ciudad;
     const response = await pool.query(
       `SELECT r.id, du.img_icon, r.calificacion
       FROM restaurante r
-      JOIN direccion_restaurante dr ON r.id = dr.id_restaurante
-      JOIN direccion d ON dr.id_direccion = d.id
+      JOIN direccion d ON r.id_direccion = d.id
       JOIN datos_usuarios du ON du.id = r.id
       WHERE d.ciudad = '${[ciudad]}'
       ORDER BY r.calificacion DESC
@@ -48,8 +31,7 @@ async function getById(req, res) {
       d.barrio, d.tipo_via, d.numero_via, d.numero_uno, d.numero_dos, d.observaciones 
       FROM restaurante r 
       inner join datos_usuarios du on r.id = du.id
-      inner join direccion_restaurante dr on r.id = dr.id_restaurante
-      inner join direccion d on dr.id_direccion = d.id
+      inner join direccion d on r.id_direccion = d.id
       inner join horario h on r.id = h.id_restaurante
       WHERE r.id = $1`,
       [id]
@@ -76,6 +58,7 @@ async function getById(req, res) {
 
     res.json(restaurant);
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ error: 'Ha ocurrido un error al obtener el restaurante' });
@@ -98,22 +81,25 @@ async function getCatAndProdByResId(req, res) {
     const rows = response.rows;
     const sections = [];
     for (let row of rows) {
-      const section = sections.find(s => s.id === row.id_seccion);
+      const section = sections.find((s) => s.id === row.id_seccion);
       if (!section) {
         sections.push({
           id: row.id_seccion,
           nombre: row.sect_nombre,
-          productos: row.id_producto ? [{
-            id: row.id_producto,
-            nombre: row.nombre,
-            descripcion: row.descripcion,
-            costo_unit: row.cost_unit,
-            img_product: row.img_product,
-            estado: row.estado
-          }] : []
+          productos: row.id_producto
+            ? [
+                {
+                  id: row.id_producto,
+                  nombre: row.nombre,
+                  descripcion: row.descripcion,
+                  costo_unit: row.cost_unit,
+                  img_product: row.img_product,
+                  estado: row.estado,
+                },
+              ]
+            : [],
         });
-      }
-      else {
+      } else {
         if (row.id_producto) {
           section.productos.push({
             id: row.id_producto,
@@ -121,7 +107,7 @@ async function getCatAndProdByResId(req, res) {
             descripcion: row.descripcion,
             costo_unit: row.cost_unit,
             img_product: row.img_product,
-            estado: row.estado
+            estado: row.estado,
           });
         }
       }
@@ -129,12 +115,13 @@ async function getCatAndProdByResId(req, res) {
     res.status(200).json(sections);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Ha ocurrido un error al obtener los productos' });
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los productos' });
   }
 }
 
 module.exports = {
-  getAll,
   getTopByCity,
   getById,
   getCatAndProdByResId,
