@@ -27,7 +27,7 @@ async function getByResID(req, res) {
 async function getByResProd(req, res) {
   try {
     const id = req.params.id;
-    const nombre = req.body.nombre;
+    const nombre = req.query.nombre;
     // Seleccionar todos los productos de un restaurante por nombre
 
     const response = await pool.query(
@@ -76,7 +76,6 @@ async function add(req, res) {
     //comprueba si el usuario es un admin
 
     if (valtipo_usuario === 2) {
-
       const {
         id_restaurante,
         disponible,
@@ -94,39 +93,43 @@ async function add(req, res) {
         !nombre ||
         !descripcion ||
         !cost_unit ||
-        !img_product 
+        !img_product
       ) {
-        return res
-          .status(400)
-          .json({ error: 'Faltan campos por llenar' });
+        return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
 
       // Verificar si el restaurante existe
       restaurante = await pool.query(
         'SELECT * FROM producto WHERE id_restaurante = $1',
         [id_restaurante]
-        );
-      
+      );
 
       if (restaurante.rowCount === 0) {
         return res.status(400).json({ error: 'El restaurante no existe' });
-      } 
-        
+      }
+
       // Agregar el producto
       response = await pool.query(
         `INSERT INTO producto ( id_restaurante, disponible, nombre, descripcion, cost_unit, img_product,estado)
             VALUES ($1, $2, $3, $4, $5 ,$6) RETURNING *`,
-        [id_restaurante, disponible, nombre, descripcion, cost_unit, img_product,true]
+        [
+          id_restaurante,
+          disponible,
+          nombre,
+          descripcion,
+          cost_unit,
+          img_product,
+          true,
+        ]
       );
-      
+
       // Recursion para agregar el producto a varias secciones
 
       for (let i = 0; i < seccciones.length; i++) {
-        
         //obttener id de seccion
         const seccion = await pool.query(
-            `SELECT id FROM seccion WHERE (nombre, id_restaurante) VALUES ($1,  $2)`,
-            [secciones[i], id_restaurante]
+          `SELECT id FROM seccion WHERE (nombre, id_restaurante) VALUES ($1,  $2)`,
+          [secciones[i], id_restaurante]
         );
 
         //Agregar el producto a una seccion
@@ -142,49 +145,30 @@ async function add(req, res) {
         message: 'Menu agregado correctamente',
         response: response.rows[0],
       });
-
-    } 
-    
-    else if (valtipo_usuario === 3) {
-
+    } else if (valtipo_usuario === 3) {
       //si es usuario no es admin, verifica si es el propio restaurante
 
-      const { 
-        estado,
-        nombre,
-        descripcion,
-        cost_unit, 
-        img_product,
-        secciones,
-      } = req.body;
+      const { estado, nombre, descripcion, cost_unit, img_product, secciones } =
+        req.body;
 
       // Validar que los campos no estén vacíos
-      if (
-        !estado ||
-        !nombre ||
-        !descripcion ||
-        !cost_unit ||
-        !img_product
-      ) {
-        return res
-          .status(400)
-          .json({ error: 'Faltan campos por llenar' });
+      if (!estado || !nombre || !descripcion || !cost_unit || !img_product) {
+        return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
 
       // Agregar el producto
       response = await pool.query(
         `INSERT INTO producto (id_restaurante, disponible, nombre, descripcion, cost_unit, img_product,estado)
             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [id, disponible, nombre, descripcion, cost_unit, img_product,true]
+        [id, disponible, nombre, descripcion, cost_unit, img_product, true]
       );
 
       // Recursion para agregar el producto a varias secciones
       for (let i = 0; i < seccciones.length; i++) {
-        
         //obttener id de seccion
         const seccion = await pool.query(
-            `SELECT id FROM seccion WHERE (nombre, id_restaurante) VALUES ($1,  $2)`,
-            [secciones[i], id_restaurante]
+          `SELECT id FROM seccion WHERE (nombre, id_restaurante) VALUES ($1,  $2)`,
+          [secciones[i], id_restaurante]
         );
 
         //Agregar el producto a una seccion
@@ -226,26 +210,14 @@ async function updateState(req, res) {
 
     const valtipo_usuario = tipo_usuario.rows[0].tipo_usuario;
 
-  
     //comprueba si el usuario es un admin
 
     if (valtipo_usuario === 2) {
-
-      const {
-        id_restaurante,
-        nombre_prod,
-        estado,
-      } = req.body;
+      const { id_restaurante, nombre_prod, estado } = req.body;
 
       // Validar que los campos no estén vacíos
-      if (
-        !id_restaurante ||
-        !nombre_prod ||
-        !estado
-      ) {
-        return res
-          .status(400)
-          .json({ error: 'Faltan campos por llenar' });
+      if (!id_restaurante || !nombre_prod || !estado) {
+        return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
 
       // Verificar si el producto existe
@@ -256,9 +228,7 @@ async function updateState(req, res) {
       );
 
       if (restaurante.rowCount === 0) {
-        return res
-        .status(400)
-        .json({ error: 'El producto no existe' });
+        return res.status(400).json({ error: 'El producto no existe' });
       }
 
       // Inhabilitar o habilitar el producto
@@ -268,27 +238,22 @@ async function updateState(req, res) {
       );
 
       if (estado === 'false') {
-        res.json({ message: 'Producto inhabilitado', response: response.rows[0] });
+        res.json({
+          message: 'Producto inhabilitado',
+          response: response.rows[0],
+        });
       } else {
-        res.json({ message: 'Producto habilitado', response: response.rows[0] });
+        res.json({
+          message: 'Producto habilitado',
+          response: response.rows[0],
+        });
       }
-    } 
-
-    else if (valtipo_usuario === 3) {
-  
-      const {
-        nombre_prod,
-        estado,
-      } = req.body;
+    } else if (valtipo_usuario === 3) {
+      const { nombre_prod, estado } = req.body;
 
       // Validar que los campos no estén vacíos
-      if (
-        !nombre_prod ||
-        !estado
-      ) {
-        return res
-          .status(400)
-          .json({ error: 'Faltan campos por llenar' });
+      if (!nombre_prod || !estado) {
+        return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
 
       // Inhabilitar o habilitar el producto
@@ -298,13 +263,20 @@ async function updateState(req, res) {
       );
 
       if (estado === 'false') {
-        res.json({ message: 'Producto inhabilitado', response: response.rows[0] });
+        res.json({
+          message: 'Producto inhabilitado',
+          response: response.rows[0],
+        });
       } else {
-        res.json({ message: 'Producto habilitado', response: response.rows[0] });
+        res.json({
+          message: 'Producto habilitado',
+          response: response.rows[0],
+        });
       }
-
     } else {
-      res.status(403).json({ error: 'No tienes permiso habilitar/inhabilitar un producto' });
+      res
+        .status(403)
+        .json({ error: 'No tienes permiso habilitar/inhabilitar un producto' });
     }
   } catch (error) {
     console.error(error);
