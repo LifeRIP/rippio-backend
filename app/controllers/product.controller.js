@@ -448,7 +448,7 @@ async function updateProd(req, res) {
   try {
     const { id } = req.user;
 
-    let restaurante;
+    let producto;
     let response;
 
     //obtiene el tipo de usuario
@@ -490,12 +490,12 @@ async function updateProd(req, res) {
 
       // Verificar si el producto existe
 
-      restaurante = await pool.query(
-        'SELECT * FROM producto WHERE id_restaurante = $1 AND nombre = $2',
-        [id_restaurante, nombre_prod]
+      producto = await pool.query(
+        'SELECT * FROM producto WHERE id_restaurante = $1 AND id = $2',
+        [id_restaurante, id_producto]
       );
 
-      if (restaurante.rowCount === 0) {
+      if (producto.rowCount === 0) {
         return res.status(400).json({ error: 'El producto no existe' });
       }
 
@@ -508,7 +508,7 @@ async function updateProd(req, res) {
       // Eliminar las secciones anteriores
       await pool.query(
         `DELETE FROM seccion_prod WHERE id_producto = $1`,
-        [restaurante.rows[0].id]
+        [producto.rows[0].id]
       );
 
       // Recursion para agregar el producto a varias secciones
@@ -518,7 +518,7 @@ async function updateProd(req, res) {
         await pool.query(
           `INSERT INTO seccion_prod (id_producto, id_seccion)
             VALUES ($1, $2) RETURNING *`,
-          [restaurante.rows[0].id, secciones[i]]
+          [producto.rows[0].id, secciones[i]]
         );
       }
 
@@ -554,16 +554,16 @@ async function updateProd(req, res) {
       }
 
       // Verificar si el producto existe
-
-      restaurante = await pool.query(
-        'SELECT * FROM producto WHERE id_restaurante = $1 AND nombre = $2',
-        [id, nombre_prod]
+      console.log(secciones)
+      producto = await pool.query(
+        'SELECT * FROM producto WHERE id_restaurante = $1 AND id = $2',
+        [id, id_producto]
       );
 
-      if (restaurante.rowCount === 0) {
+      if (producto.rowCount === 0) {
         return res.status(400).json({ error: 'El producto no existe' });
       }
-
+      
       // Actualizar el producto
       response = await pool.query(
         `UPDATE producto SET disponible = $1, nombre = $2, descripcion = $3, cost_unit = $4, img_product = $5 WHERE id_restaurante = $6 AND id = $7 RETURNING *`,
@@ -573,7 +573,7 @@ async function updateProd(req, res) {
       // Eliminar las secciones anteriores
       await pool.query(
         `DELETE FROM seccion_prod WHERE id_producto = $1`,
-        [restaurante.rows[0].id]
+        [producto.rows[0].id]
       );
 
       // Recursion para agregar el producto a varias secciones
@@ -583,7 +583,7 @@ async function updateProd(req, res) {
         await pool.query(
           `INSERT INTO seccion_prod (id_producto, id_seccion)
             VALUES ($1, $2) RETURNING *`,
-          [restaurante.rows[0].id, secciones[i]]
+          [producto.rows[0].id, secciones[i]]
         );
       }
 
