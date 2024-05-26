@@ -324,7 +324,6 @@ async function updateSeccionProd(req, res) {
     const { id } = req.user;
 
     let producto;
-    let response;
 
     //obtiene el tipo de usuario
 
@@ -384,7 +383,6 @@ async function updateSeccionProd(req, res) {
       // Responder al cliente
       res.json({
         message: 'Seccion actualizada correctamente',
-        response: response.rows[0],
       });
     } else if (valtipo_usuario === 3) {
       const {
@@ -399,7 +397,7 @@ async function updateSeccionProd(req, res) {
       ) {
         return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
-
+      console.log(secciones)
       // Verificar si el producto existe
 
       producto = await pool.query(
@@ -433,7 +431,6 @@ async function updateSeccionProd(req, res) {
       // Responder al cliente
       res.json({
         message: 'Seccion actualizada correctamente',
-        response: response.rows[0],
       });
     }
   }
