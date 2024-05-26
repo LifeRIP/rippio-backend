@@ -27,7 +27,7 @@ async function addSchedule(req, res) {
             // Agregar el horario
             await pool.query(
              'INSERT INTO horario (id_restaurante, dia_semana, hora_apertura, hora_cierre) VALUES ($1, $2, $3, $4)',
-             [id, dias[i], hora_inicio, hora_fin]
+             [id, dias[i], hora_inicio[i], hora_fin[i]]
             );
         }
         
@@ -78,7 +78,7 @@ async function updateSchedule(req, res) {
         for (let i = 0; i < dias.length; i++) {
             await pool.query(
                 `UPDATE horario SET hora_apertura = $1, hora_cierre = $2 WHERE id_restaurante = $3 and dia_semana = $4`,
-                [hora_inicio, hora_fin, id, dias[i]]
+                [hora_inicio[i], hora_fin[i], id, dias[i]]
             );
         }
 
