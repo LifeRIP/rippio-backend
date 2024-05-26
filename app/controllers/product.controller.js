@@ -443,4 +443,161 @@ async function updateSeccionProd(req, res) {
   }
 }
 
-module.exports = { getByResID, getByResProd, add, updateState, updateSeccionProd};
+async function updateProd(req, res) {
+  // Actualizar un producto en la base de datos
+  try {
+    const { id } = req.user;
+
+    let restaurante;
+    let response;
+
+    //obtiene el tipo de usuario
+
+    const tipo_usuario = await pool.query(
+      'SELECT tipo_usuario FROM datos_usuarios WHERE id = $1',
+      [id]
+    );
+
+    const valtipo_usuario = tipo_usuario.rows[0].tipo_usuario;
+
+    //comprueba si el usuario es un admin
+
+    if (valtipo_usuario === 2) {
+      const {
+        id_restaurante,
+        id_producto,
+        disponible,
+        nombre,
+        descripcion,
+        cost_unit,
+        img_product,
+        secciones,
+      } = req.body;
+
+      // Validar que los campos no estén vacíos
+      if (
+        !id_restaurante ||
+        !id_producto ||
+        !disponible ||
+        !nombre ||
+        !descripcion ||
+        !cost_unit ||
+        !img_product ||
+        !secciones
+      ) {
+        return res.status(400).json({ error: 'Faltan campos por llenar' });
+      }
+
+      // Verificar si el producto existe
+
+      restaurante = await pool.query(
+        'SELECT * FROM producto WHERE id_restaurante = $1 AND nombre = $2',
+        [id_restaurante, nombre_prod]
+      );
+
+      if (restaurante.rowCount === 0) {
+        return res.status(400).json({ error: 'El producto no existe' });
+      }
+
+      // Actualizar el producto
+      response = await pool.query(
+        `UPDATE producto SET disponible = $1, nombre = $2, descripcion = $3, cost_unit = $4, img_product = $5 WHERE id_restaurante = $6 AND id = $7 RETURNING *`,
+        [disponible, nombre, descripcion, cost_unit, img_product, id_restaurante, id_producto]
+      );
+
+      // Eliminar las secciones anteriores
+      await pool.query(
+        `DELETE FROM seccion_prod WHERE id_producto = $1`,
+        [restaurante.rows[0].id]
+      );
+
+      // Recursion para agregar el producto a varias secciones
+      for (let i = 0; i < secciones.length; i++) {
+
+        //Agregar el producto a una seccion
+        await pool.query(
+          `INSERT INTO seccion_prod (id_producto, id_seccion)
+            VALUES ($1, $2) RETURNING *`,
+          [restaurante.rows[0].id, secciones[i]]
+        );
+      }
+
+      // Responder al cliente
+      res.json({
+        message: 'Producto actualizado correctamente',
+        response: response.rows[0],
+      });
+    }
+    
+    else if (valtipo_usuario === 3) {
+      const {
+        id_producto,
+        disponible,
+        nombre,
+        descripcion,
+        cost_unit,
+        img_product,
+        secciones,
+      } = req.body;
+
+      // Validar que los campos no estén vacíos
+      if (
+        !id_producto ||
+        !disponible ||
+        !nombre ||
+        !descripcion ||
+        !cost_unit ||
+        !img_product ||
+        !secciones
+      ) {
+        return res.status(400).json({ error: 'Faltan campos por llenar' });
+      }
+
+      // Verificar si el producto existe
+
+      restaurante = await pool.query(
+        'SELECT * FROM producto WHERE id_restaurante = $1 AND nombre = $2',
+        [id, nombre_prod]
+      );
+
+      if (restaurante.rowCount === 0) {
+        return res.status(400).json({ error: 'El producto no existe' });
+      }
+
+      // Actualizar el producto
+      response = await pool.query(
+        `UPDATE producto SET disponible = $1, nombre = $2, descripcion = $3, cost_unit = $4, img_product = $5 WHERE id_restaurante = $6 AND id = $7 RETURNING *`,
+        [disponible, nombre, descripcion, cost_unit, img_product, id, id_producto]
+      );
+
+      // Eliminar las secciones anteriores
+      await pool.query(
+        `DELETE FROM seccion_prod WHERE id_producto = $1`,
+        [restaurante.rows[0].id]
+      );
+
+      // Recursion para agregar el producto a varias secciones
+      for (let i = 0; i < secciones.length; i++) {
+
+        //Agregar el producto a una seccion
+        await pool.query(
+          `INSERT INTO seccion_prod (id_producto, id_seccion)
+            VALUES ($1, $2) RETURNING *`,
+          [restaurante.rows[0].id, secciones[i]]
+        );
+      }
+
+      // Responder al cliente
+      res.json({
+        message: 'Producto actualizado correctamente',
+        response: response.rows[0],
+      });
+    }
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ha ocurrido un error al actualizar el producto' });
+  }
+}
+
+module.exports = { getByResID, getByResProd, add, updateState, updateSeccionProd, updateProd};
