@@ -93,18 +93,20 @@ async function deleteSchedule(req, res) {
     try {
         const { id } = req.user;
 
-        const { dia } = req.body;
+        const { dias } = req.body;
 
         // Validar que los campos no estén vacíos
-        if (!dia) {
+        if (!dias) {
             return res.status(400).json({ error: 'Por favor complete todos los campos' });
         }
 
         // Eliminar el horario
-        await pool.query(
-            `DELETE FROM horario WHERE id_restaurante = $1 and dia_semana = $2`,
-            [id, dia]
-        );
+        for (let i = 0; i < dias.length; i++) {
+            await pool.query(
+                `DELETE FROM horario WHERE id_restaurante = $1 and dia_semana = $2`,
+                [id, dias[i]]
+            );
+        }
 
         res.json({ message: 'Horario eliminado correctamente' });
 
