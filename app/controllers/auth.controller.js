@@ -29,6 +29,20 @@ async function register(req, res) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
 
+    // Validar que la identificación tenga mas de 15 caracteres
+    if (identificacion.length > 15) {
+      return res
+        .status(400)
+        .json({ message: 'La identificación debe tener 15 caracteres como maximo' });
+    }
+
+    // Validar que el telefono tenga 10 caracteres
+    if (telefono.length != 10) {
+      return res
+        .status(400)
+        .json({ message: 'El telefono debe tener 10 caracteres' });
+    }
+
     // Validar que el email no esté registrado
     const emailExist = await pool.query(
       'SELECT * FROM datos_usuarios WHERE email = $1',
@@ -101,8 +115,6 @@ async function register(req, res) {
     );
 
     res.status(201).json({
-      token,
-      id,
     });
   } catch (error) {
     console.error(error);
