@@ -597,4 +597,98 @@ async function updateProd(req, res) {
   }
 }
 
-module.exports = { getByResID, getByResProd, add, updateState, updateSeccionProd, updateProd};
+async function deleteProd(req, res) {
+  // Eliminar un producto de un restaurante en la base de datos
+  try {
+    const { id } = req.user;
+
+    let producto;
+
+    //obtiene el tipo de usuario
+
+    const tipo_usuario = await pool.query(
+      'SELECT tipo_usuario FROM datos_usuarios WHERE id = $1',
+      [id]
+    );
+
+    const valtipo_usuario = tipo_usuario.rows[0].tipo_usuario;
+
+    //comprueba si el usuario es un admin
+
+    if (valtipo_usuario === 2) {
+      const {
+        id_restaurante,
+        id_producto,
+      } = req.body;
+
+      // Validar que los campos no estén vacíos
+      if (
+        !id_restaurante ||
+        !id_producto
+      ) {
+        return res.status(400).json({ error: 'Faltan campos por llenar' });
+      }
+
+      // Verificar si el producto existe
+
+      producto = await pool.query(
+        'SELECT * FROM producto WHERE id_restaurante = $1 AND id = $2',
+        [id_restaurante, id_producto]
+      );
+
+      if (producto.rowCount === 0) {
+        return res.status(400).json({ error: 'El producto no existe' });
+      }
+
+      // Eliminar el producto
+      await pool.query(
+        `Update producto SET estado = false WHERE id_restaurante = $1 AND id = $2`,
+        [id_restaurante, id_producto]
+      );
+
+      // Responder al cliente
+      res.json({
+        message: 'Producto eliminado correctamente',
+      });
+    } else if (valtipo_usuario === 3) {
+      const {
+        id_producto,
+      } = req.body;
+
+      // Validar que los campos no estén vacíos
+      if (
+        !id_producto
+      ) {
+        return res.status(400).json({ error: 'Faltan campos por llenar' });
+      }
+
+      // Verificar si el producto existe
+
+      producto = await pool.query(
+        'SELECT * FROM producto WHERE id_restaurante = $1 AND id = $2',
+        [id, id_producto]
+      );
+
+      if (producto.rowCount === 0) {
+        return res.status(400).json({ error: 'El producto no existe' });
+      }
+
+      // Eliminar el producto
+      await pool.query(
+        `Update producto SET estado = false WHERE id_restaurante = $1 AND id = $2`,
+        [id, id_producto]
+      );
+
+      // Responder al cliente
+      res.json({
+        message: 'Producto eliminado correctamente',
+      });
+    }
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ha ocurrido un error al eliminar el producto' });
+  }
+}
+
+module.exports = { getByResID, getByResProd, add, updateState, updateSeccionProd, updateProd, deleteProd};
