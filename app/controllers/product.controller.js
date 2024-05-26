@@ -153,7 +153,10 @@ async function add(req, res) {
         secciones 
       } = req.body;
 
+      
       // Validar que los campos no estén vacíos
+      // Add missing variable declaration for 'response'
+
       if (
         !disponible ||
         !nombre ||
@@ -164,14 +167,14 @@ async function add(req, res) {
       ) {
         return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
-
+      console.log(secciones)
       // Agregar el producto
       response = await pool.query(
         `INSERT INTO producto (id_restaurante, disponible, nombre, descripcion, cost_unit, img_product,estado)
-            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            VALUES ($1, $2, $3, $4, $5, $6,$7) RETURNING *`,
         [id, disponible, nombre, descripcion, cost_unit, img_product, true]
       );
-
+      console.log("hola")
       // Recursion para agregar el producto a varias secciones
       for (let i = 0; i < secciones.length; i++) {
 
