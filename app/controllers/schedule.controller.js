@@ -21,6 +21,13 @@ async function addSchedule(req, res) {
             return res.status(400).json({ error: 'Por favor complete todos los campos' });
         }
         
+        //Validar que la hora de cierre sea mayor a la hora de apertura
+        for (let i = 0; i < dias.length; i++) {
+            if (hora_inicio[i] > hora_fin[i]) {
+                return res.status(400).json({ error: 'La hora de cierre debe ser mayor a la hora de apertura' });
+            }
+        }
+        
         // Recursion para agregar horario
         
         for (let i = 0; i < dias.length; i++) {
@@ -47,7 +54,13 @@ async function getSchedule(req, res) {
             [id]
         );
 
-        res.status(200).json(response.rows);
+        const daysOrder = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+        const orderedRows = response.rows.sort((a, b) => {
+            return daysOrder.indexOf(a.dia_semana) - daysOrder.indexOf(b.dia_semana);
+        });
+
+        res.status(200).json(orderedRows);
 
     } catch (error) {
         res.status(500).json({ error: 'Ha ocurrido un error al obtener el horario' });
@@ -71,6 +84,13 @@ async function updateSchedule(req, res) {
             !hora_fin
         ) {
             return res.status(400).json({ error: 'Por favor complete todos los campos' });
+        }
+
+        //Validar que la hora de cierre sea mayor a la hora de apertura
+        for (let i = 0; i < dias.length; i++) {
+            if (hora_inicio[i] > hora_fin[i]) {
+                return res.status(400).json({ error: 'La hora de cierre debe ser mayor a la hora de apertura' });
+            }
         }
 
         // Actualizar el horario
