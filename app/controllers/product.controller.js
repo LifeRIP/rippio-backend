@@ -127,12 +127,7 @@ async function add(req, res) {
       // Recursion para agregar el producto a varias secciones
 
       for (let i = 0; i < secciones.length; i++) {
-        //obttener id de seccion
-        const seccion = await pool.query(
-          `SELECT id FROM seccion WHERE (nombre, id_restaurante) VALUES ($1,  $2)`,
-          [secciones[i], id_restaurante]
-        );
-
+        
         //Agregar el producto a una seccion
         await pool.query(
           `INSERT INTO seccion_prod (id_producto, id_seccion)
@@ -179,11 +174,6 @@ async function add(req, res) {
 
       // Recursion para agregar el producto a varias secciones
       for (let i = 0; i < secciones.length; i++) {
-        //obttener id de seccion
-        const seccion = await pool.query(
-          `SELECT id FROM seccion WHERE (nombre, id_restaurante) VALUES ($1,  $2)`,
-          [secciones[i], id]
-        );
 
         //Agregar el producto a una seccion
         await pool.query(
