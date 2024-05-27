@@ -1,41 +1,17 @@
 const express = require('express');
 const { router } = require('./app/routes/index');
+const { corsOptions } = require('./app/services/cors');
 const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
-
-// Server
 const app = express();
 const port = process.env.PORT || 4000;
-app.listen(port);
-console.log(`Servidor corriendo en http://localhost:${port}/`);
 
 // Configuracion
 app.use(express.static(path.join(__dirname, '/app/public'))); // Rutas de prueba
 app.use(express.json()); // Para que express pueda entender los datos que vienen del cliente
 app.use(helmet()); // Seguridad
-
-// Cors
-const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:4000',
-      'https://rippio-api.vercel.app',
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'https://rippio.netlify.app',
-    ];
-
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Origin not allowed'), false);
-    }
-  },
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
+app.use(cors(corsOptions)); // Cors
 
 // Rutas API
 app.use('/api', router);
@@ -53,3 +29,7 @@ app.get('/reset-password', (req, res) =>
 app.get('/login', (req, res) =>
   res.sendFile(path.join(__dirname, '/app/pages/login.html'))
 );
+
+// Server
+app.listen(port);
+console.log(`Servidor corriendo en http://localhost:${port}/`);
