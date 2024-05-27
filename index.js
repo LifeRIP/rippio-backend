@@ -8,27 +8,18 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // Configuracion
-app.use(express.static(path.join(__dirname, '/app/public'))); // Rutas de prueba
 app.use(express.json()); // Para que express pueda entender los datos que vienen del cliente
 app.use(helmet()); // Seguridad
-app.use(cors(corsOptions)); // Cors
+app.use(cors(corsOptions));
 
 // Rutas API
-app.use('/api', router);
-
-// Rutas de pruebas para el login
 app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, '/app/pages/login.html'))
+  res.sendFile(path.join(__dirname, '/app/pages/index.html'))
 );
-app.get('/forgot-password', (req, res) =>
-  res.sendFile(path.join(__dirname, '/app/pages/forgot-password.html'))
-);
-app.get('/reset-password', (req, res) =>
-  res.sendFile(path.join(__dirname, '/app/pages/reset-password.html'))
-);
-app.get('/login', (req, res) =>
-  res.sendFile(path.join(__dirname, '/app/pages/login.html'))
-);
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'URL_NOT_FOUND' });
+});
+app.use('/api', router);
 
 // Server
 app.listen(port);
