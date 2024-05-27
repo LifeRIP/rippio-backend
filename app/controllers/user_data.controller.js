@@ -35,19 +35,46 @@ async function getAllByRol(req, res) {
 async function getById(req, res) {
   try {
     const id = req.params.id;
-    const response = await pool.query(
-      `SELECT id, identificacion, nombre, apellido, email, telefono, tipo_usuario, img_icon, estado, creditos 
+
+    // Obtener el tipo del usuario
+    const tipo_usuario = await pool.query(
+      `SELECT tipo_usuario
       FROM datos_usuarios
-      WHERE id = $1`,
-      [id]
+      WHERE id = $1`, [id]
     );
 
-    // Si no se encuentra el usuario
-    if (response.rows.length === 0) {
+    //Si no encuentra el usuario
+    if (tipo_usuario.rows.length === 0) {
       return res.status(404).json({ error: 'No se encontró el usuario' });
     }
 
-    res.json(response.rows);
+    //si el usuario es un cliente
+    if (tipo_usuario.rows[0].tipo_usuario === 1) {
+      const response = await pool.query(
+        `SELECT id, identificacion, nombre, apellido, email, telefono, tipo_usuario, img_icon, estado, creditos 
+        FROM datos_usuarios
+        WHERE id = $1`,
+        [id]
+      );
+      res.status(200).json(response.rows);
+      return;
+    }
+
+    //si el usuario es un restaurante
+    if (tipo_usuario.rows[0].tipo_usuario === 3) {
+      const response = await pool.query(
+        `SELECT du.id, du.identificacion, du.nombre, du.apellido, du.email, du.telefono, du.tipo_usuario, du.img_icon, du.estado, du.creditos, 
+        r.calificacion, r.img_banner
+		    FROM datos_usuarios du
+		    inner join restaurante r on du.id = r.id
+        WHERE du.id = $1`,
+        [id]
+      );
+      res.status(200).json(response.rows);
+      return;
+    }
+
+
   } catch (error) {
     console.error(error);
     res
