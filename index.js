@@ -16,10 +16,10 @@ app.use(cors(corsOptions));
 app.get('/', (req, res) =>
   res.sendFile(path.join(__dirname, '/app/pages/index.html'))
 );
+app.use('/api', router);
 app.use('*', (req, res) => {
   res.status(404).json({ error: 'URL_NOT_FOUND' });
 });
-app.use('/api', router);
 
 // Server
 app.listen(port);
