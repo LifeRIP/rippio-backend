@@ -102,17 +102,29 @@ async function register(req, res) {
       ]
     );
 
+    //si es restaurante se inserta en la tabla de restaurantes
+    if (tipo_usuario == 3) {
+      await pool.query(
+        `
+        INSERT INTO restaurante
+        (id, calificacion, img_banner, id_direccion) VALUES ($1, $2, $3, $4)`,
+        [id,
+          0,
+          'https://firebasestorage.googleapis.com/v0/b/rippio.appspot.com/o/RestaurantBanner%2FbannerDefault.png?alt=media&token=b024c6e2-8e7b-4696-baf8-e7219b4c9268',
+          null]);
+    }
+
     // Crear token
-    const token = await jwt.sign(
-      {
-        id,
-        tipo_usuario,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: expiresIn, // 30 dias en segundos
-      }
-    );
+    // const token = await jwt.sign(
+    //   {
+    //     id,
+    //     tipo_usuario,
+    //   },
+    //   process.env.JWT_SECRET,
+    //   {
+    //     expiresIn: expiresIn, // 30 dias en segundos
+    //   }
+    // );
 
     res.status(201).json({
     });
