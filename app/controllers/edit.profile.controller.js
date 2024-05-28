@@ -237,6 +237,29 @@ async function modify_address(req, res) {
   }
 }
 
+async function getAddressById(req, res) {
+  try {
+    // Obtener el id del usuario despues de pasar por el middleware de autenticacion
+    const { id } = req.user;
+
+    const Address = await pool.query(
+      'SELECT * FROM direccion_usuario Du  join direccion D on Du.id_direccion = D.id WHERE id_usuario = $1',
+      [id]
+    );
+
+    if (Address.rows.length === 0) {
+      return res.status(400).json({ message: 'No hay direcciones' });
+    }
+
+    res.json(Address.rows);
+
+  } catch (e) {
+    res
+      .status(500)
+      .json({ message: 'Ha ocurrido un error al obtener la direccion' });
+  }
+}
+
 async function modify_profile_image(req, res) {
   try {
     // Obtener el id del usuario despues de pasar por el middleware de autenticacion
@@ -521,6 +544,7 @@ module.exports = {
   change_password,
   add_address,
   modify_address,
+  getAddressById,
   modify_profile_image,
   modify_banner_restaurant,
   add_payment_method,
