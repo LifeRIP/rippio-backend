@@ -64,6 +64,7 @@ async function getById(req, res) {
       .json({ error: 'Ha ocurrido un error al obtener el restaurante' });
   }
 }
+
 async function getCatAndProdByResId(req, res) {
   try {
     const { id } = req.params;
@@ -122,8 +123,30 @@ async function getCatAndProdByResId(req, res) {
   }
 }
 
+async function getByCategory(req, res) {
+  try {
+    const { id_category } = req.params;
+    const response = await pool.query(
+      `SELECT Du.id, Du.nombre, Du.img_icon, Du.estado
+      FROM categoria Cat 
+      join categoria_res Catres on Cat.id = Catres.id_categoria 
+      join datos_usuarios Du on Catres.id_restaurante = Du.id
+      WHERE Cat.id = $1`,
+      [id_category]
+    );
+
+    res.status(200).json(response.rows);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los productos' });
+  }
+}
+
 module.exports = {
   getTopByCity,
   getById,
   getCatAndProdByResId,
+  getByCategory,
 };
