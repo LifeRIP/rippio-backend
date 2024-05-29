@@ -21,49 +21,6 @@ async function getTopByCity(req, res) {
   }
 }
 
-async function getById(req, res) {
-  try {
-    const id = req.params.id;
-    const response = await pool.query(
-      `SELECT r.id as resId, r.calificacion, r.img_banner,
-      du.nombre resNom, du.img_icon,
-      h.dia_semana, h.hora_apertura, h.hora_cierre,
-      d.barrio, d.tipo_via, d.numero_via, d.numero_uno, d.numero_dos, d.observaciones 
-      FROM restaurante r 
-      inner join datos_usuarios du on r.id = du.id
-      inner join direccion d on r.id_direccion = d.id
-      inner join horario h on r.id = h.id_restaurante
-      WHERE r.id = $1`,
-      [id]
-    );
-
-    const rows = response.rows;
-    const restaurant = {
-      id: rows[0].resid,
-      nombre: rows[0].resnom,
-      img_banner: rows[0].img_banner,
-      img_icon: rows[0].img_icon,
-      direccion: `${rows[0].tipo_via} ${rows[0].numero_via} #${rows[0].numero_uno} ${rows[0].numero_dos} ${rows[0].barrio}`,
-      calificacion: rows[0].calificacion,
-      horario: [],
-    };
-
-    for (let row of rows) {
-      restaurant.horario.push({
-        day: row.dia_semana,
-        open: row.hora_apertura,
-        close: row.hora_cierre,
-      });
-    }
-
-    res.json(restaurant);
-  } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ error: 'Ha ocurrido un error al obtener el restaurante' });
-  }
-}
 async function getCatAndProdByResId(req, res) {
   try {
     const { id } = req.params;
@@ -122,8 +79,82 @@ async function getCatAndProdByResId(req, res) {
   }
 }
 
+async function getInfoById(req, res) {
+  try {
+    const id = req.params.id;
+
+    const response = await pool.query(
+      `SELECT 
+      du.id,
+      du.nombre,
+      du.img_icon,
+      du.estado,
+      r.calificacion,
+      r.img_banner,
+      d.departamento,
+      d.ciudad,
+      d.barrio,
+      d.tipo_via,
+      d.numero_via,
+      d.numero_uno,
+      d.numero_dos,
+      d.observaciones,
+      h.dia_semana,
+      h.hora_apertura,
+      h.hora_cierre
+      FROM datos_usuarios du
+      inner join restaurante r on r.id = du.id
+      inner join direccion_usuario dir on r.id = dir.id_usuario
+      inner join direccion d on d.id = dir.id_direccion
+      inner join horario h on h.id_restaurante = r.id
+      where du.id=$1`,
+      [id]
+    );
+
+
+    const rows = response.rows;
+    const restaurant = {
+      id: rows[0].id,
+      nombre: rows[0].nombre,
+      img_icon: rows[0].img_icon,
+      estado: rows[0].estado,
+      calificacion: rows[0].calificacion,
+      img_banner: rows[0].img_banner,
+      direccion: `${rows[0].tipo_via} ${rows[0].numero_via} #${rows[0].numero_uno} ${rows[0].numero_dos} ${rows[0].barrio} ${rows[0].ciudad} ${rows[0].departamento}`,
+      horario: [],
+    };
+
+    for (let row of rows) {
+      restaurant.horario.push({
+        day: row.dia_semana,
+        open: row.hora_apertura,
+        close: row.hora_cierre,
+      });
+    }
+    const daysOfWeek = {
+      'Lunes': 1,
+      'Martes': 2,
+      'Miércoles': 3,
+      'Jueves': 4,
+      'Viernes': 5,
+      'Sábado': 6,
+      'Domingo': 7
+    };
+
+    restaurant.horario.sort((a, b) => daysOfWeek[a.day] - daysOfWeek[b.day]);
+    
+    res.status(200).json(restaurant);
+
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener la información del restaurante' });
+  }
+}
+
 module.exports = {
   getTopByCity,
-  getById,
   getCatAndProdByResId,
+  getInfoById
 };
