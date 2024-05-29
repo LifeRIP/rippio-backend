@@ -539,6 +539,39 @@ async function modify_payment_method(req, res) {
   }
 }
 
+async function get_payment_methods(req, res) {
+  try {
+    // Obtener el id del usuario despues de pasar por el middleware de autenticacion
+    const { id } = req.user;
+
+    const paymentMethod = await pool.query(
+      'SELECT * FROM detalles_metodo_pago WHERE id_usuario = $1',
+      [id]
+    );
+
+    if (paymentMethod.rows.length === 0) {
+      return res.status(400).json({ message: 'No hay tarjetas' });
+    }
+
+    res.json(paymentMethod.rows);
+  } catch (e) {
+    res
+      .status(500)
+      .json({ message: 'Ha ocurrido un error al obtener la tarjeta' });
+  }
+}
+
+async function get_type_payment_methods(req, res) {
+  try {
+    const paymentMethod = await pool.query('SELECT * FROM metodo_pago');
+    res.json(paymentMethod.rows);
+  } catch (e) {
+    res
+      .status(500)
+      .json({ message: 'Ha ocurrido un error al obtener los tipos de tarjeta' });
+  }
+}
+
 module.exports = {
   change_data,
   change_password,
@@ -549,4 +582,6 @@ module.exports = {
   modify_banner_restaurant,
   add_payment_method,
   modify_payment_method,
+  get_payment_methods,
+  get_type_payment_methods,
 };
