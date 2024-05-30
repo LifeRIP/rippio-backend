@@ -74,17 +74,17 @@ async function getById(req, res) {
     }
 
     // Si el usuario es un restaurante
-    if (tipo_usuario.rows[0].tipo_usuario === 3) {
+if (tipo_usuario.rows[0].tipo_usuario === 3) {
       const response = await pool.query(
         `SELECT du.id, du.identificacion, du.nombre, du.apellido, du.email, du.telefono, du.tipo_usuario, du.img_icon, du.estado, du.creditos, 
         r.calificacion, r.img_banner,
-		  dir.departamento, dir.ciudad, dir.barrio, dir.tipo_via, dir.numero_via, dir.numero_uno, dir.numero_dos, dir.observaciones,
-		  cr.id_categoria    
-			FROM datos_usuarios du
-		  inner join restaurante r on du.id = r.id
-			inner join direccion_usuario diru on diru.id_usuario = r.id
-			inner join direccion dir on diru.id_direccion = dir.id
-			inner join categoria_res cr on cr.id_restaurante = r.id
+        dir.departamento, dir.ciudad, dir.barrio, dir.tipo_via, dir.numero_via, dir.numero_uno, dir.numero_dos, dir.observaciones,
+        cr.id_categoria    
+        FROM datos_usuarios du
+        LEFT JOIN restaurante r ON du.id = r.id
+        LEFT JOIN direccion_usuario diru ON diru.id_usuario = r.id
+        LEFT JOIN direccion dir ON diru.id_direccion = dir.id
+        LEFT JOIN categoria_res cr ON cr.id_restaurante = r.id
         WHERE du.id = $1`,
         [id]
       );
