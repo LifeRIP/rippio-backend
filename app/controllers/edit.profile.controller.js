@@ -102,10 +102,11 @@ async function change_data(req, res) {
         [id]
       );
 
-      //id de la direccion
-      const id_dir = addressExist.rows[0].id_direccion;
-
+      
+      
       if (addressExist.rows.length > 0) {
+        //id de la direccion
+        const id_dir = addressExist.rows[0].id_direccion;
         // Update address in the database
         await pool.query(
           `UPDATE direccion SET departamento=$1, ciudad=$2, barrio=$3, tipo_via=$4, numero_via=$5, numero_uno=$6, numero_dos=$7, observaciones=$8
