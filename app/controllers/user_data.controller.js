@@ -40,15 +40,16 @@ async function getById(req, res) {
     const tipo_usuario = await pool.query(
       `SELECT tipo_usuario
       FROM datos_usuarios
-      WHERE id = $1`, [id]
+      WHERE id = $1`,
+      [id]
     );
 
-    //Si no encuentra el usuario
+    // Si no encuentra el usuario
     if (tipo_usuario.rows.length === 0) {
       return res.status(404).json({ error: 'No se encontró el usuario' });
     }
 
-    //si el usuario es un cliente
+    // Si el usuario es un cliente
     if (tipo_usuario.rows[0].tipo_usuario === 1) {
       const response = await pool.query(
         `SELECT id, identificacion, nombre, apellido, email, telefono, tipo_usuario, img_icon, estado, creditos 
@@ -56,25 +57,34 @@ async function getById(req, res) {
         WHERE id = $1`,
         [id]
       );
-      res.status(200).json(response.rows);
-      return;
+      return res.json(response.rows);
     }
 
-    //si el usuario es un restaurante
-    if (tipo_usuario.rows[0].tipo_usuario === 3) {
+    // Si el usuario es un administrador
+    if (tipo_usuario.rows[0].tipo_usuario === 2) {
       const response = await pool.query(
         `SELECT du.id, du.identificacion, du.nombre, du.apellido, du.email, du.telefono, du.tipo_usuario, du.img_icon, du.estado, du.creditos, 
-        r.calificacion, r.img_banner
+        a.id_direccion
 		    FROM datos_usuarios du
-		    inner join restaurante r on du.id = r.id
+		    INNER JOIN administrador a ON du.id = a.id
         WHERE du.id = $1`,
         [id]
       );
-      res.status(200).json(response.rows);
-      return;
+      return res.json(response.rows);
     }
 
-
+    // Si el usuario es un restaurante
+    if (tipo_usuario.rows[0].tipo_usuario === 3) {
+      const response = await pool.query(
+        `SELECT du.id, du.identificacion, du.nombre, du.apellido, du.email, du.telefono, du.tipo_usuario, du.img_icon, du.estado, du.creditos, 
+        r.calificacion, r.img_banner, r.id_direccion
+		    FROM datos_usuarios du
+		    INNER join restaurante r ON du.id = r.id
+        WHERE du.id = $1`,
+        [id]
+      );
+      return res.json(response.rows);
+    }
   } catch (error) {
     console.error(error);
     res
