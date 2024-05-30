@@ -4,34 +4,101 @@ const bcrypt = require('bcrypt');
 async function change_data(req, res) {
   try {
     // Obtener el id del usuario despues de pasar por el middleware de autenticacion
-    const { id } = req.user;
+    const { id, tipo_usuario } = req.user;
 
-    const { nombre, apellido, telefono } = req.body;
+    if (tipo_usuario === 1 || tipo_usuario === 2) {
+      const { nombre, apellido, telefono } = req.body;
 
-    // Validar que los campos no estén vacíos
-    if (!nombre || !apellido || !telefono) {
-      return res.status(400).json({ message: 'Faltan campos por llenar' });
+      // Validar que los campos no estén vacíos
+      if (!nombre || !apellido || !telefono) {
+        return res.status(400).json({ message: 'Faltan campos por llenar' });
+      }
+
+      // Validar que el telefono no esté vinculado a otra cuenta, excluyendo al usuario actual
+      const telefonoExist = await pool.query(
+        'SELECT * FROM datos_usuarios WHERE telefono = $1 AND id != $2',
+        [telefono, id]
+      );
+
+      if (telefonoExist.rows.length > 0) {
+        return res
+          .status(400)
+          .json({ message: 'El numero de telefono ya está en uso' });
+      }
+
+      // Actualizar informacion en la base de datos
+
+      await pool.query(
+        'UPDATE datos_usuarios SET nombre = $1 , apellido = $2 , telefono = $3 WHERE id = $4',
+        [nombre, apellido, telefono, id]
+      );
     }
 
-    // Validar que el telefono no esté vinculado a otra cuenta, excluyendo al usuario actual
-    const telefonoExist = await pool.query(
-      'SELECT * FROM datos_usuarios WHERE telefono = $1 AND id != $2',
-      [telefono, id]
-    );
+    if (tipo_usuario === 3) {
+      const { direccion, celular, categorias } = req.body;
 
-    if (telefonoExist.rows.length > 0) {
-      return res
-        .status(400)
-        .json({ message: 'El numero de telefono ya está en uso' });
+      // Validar que los campos no estén vacíos
+      if (!direccion || !celular || !categoria) {
+        return res.status(400).json({ message: 'Faltan campos por llenar' });
+      }
+
+      // Validar que el celular no esté vinculado a otra cuenta, excluyendo al usuario actual
+      const celularExist = await pool.query(
+        'SELECT * FROM datos_usuarios WHERE telefono = $1 AND id != $2',
+        [celular, id]
+      );
+
+      if (celularExist.rows.length > 0) {
+        return res
+          .status(400)
+          .json({ message: 'El numero de telefono ya está en uso' });
+      }
+
+
+      // Delete existing categories
+      await pool.query('DELETE FROM categoria_restaurante WHERE id_restaurante = $1', [id]);
+
+      // Add new main category
+      await pool.query(
+        'INSERT INTO categoria_restaurante(id_restaurante, id_categoria) VALUES ($1, $2)',
+        [id, categorias.main]
+      );
+
+      // Add new secondary category
+      await pool.query(
+        'INSERT INTO categoria_restaurante(id_restaurante, id_categoria) VALUES ($1, $2)',
+        [id, categorias.secondary]
+      );
+
+      // Actualizar informacion en la base de datos
+      const {barrio, tipoVia, ciudad, departamento, numAddress, firstNumAddress, secondNumAddress} = direccion;
+      const observaciones = direccion.observaciones || '';
+
+      if (
+          !barrio ||
+          !tipoVia ||
+          !ciudad ||
+          !departamento ||
+          !numAddress ||
+          !firstNumAddress ||
+          !secondNumAddress
+        ) {
+          return res.status(400).json({ message: 'Faltan campos por llenar' });
+        }
+      
+      // Crear nueva direccion en la base de datos
+      const id_dir = await pool.query(`
+      INSER INTO direccion(departamento, ciudad, barrio, tipo_via, numero_via, numero_uno, numero_dos, observaciones)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
+      `,
+      [departamento, ciudad, barrio, tipoVia, numAddress, firstNumAddress, secondNumAddress, observaciones]
+      );
+
+      //Crear la relación en direccion_usuario
+      await pool.query(`
+      INSERT INTO direccion_usuario(id_usuario, id_direccion)`
+      , [id, id_dir.rows[0].id])
     }
-
-    // Actualizar informacion en la base de datos
-
-    await pool.query(
-      'UPDATE datos_usuarios SET nombre = $1 , apellido = $2 , telefono = $3 WHERE id = $4',
-      [nombre, apellido, telefono, id]
-    );
-
     res.json({ message: 'Actualizacion de datos exitosa' });
   } catch (e) {
     console.error(e.message);
