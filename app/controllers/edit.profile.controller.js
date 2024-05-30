@@ -38,9 +38,10 @@ async function change_data(req, res) {
       const { direccion, celular, categorias } = req.body;
 
       // Validar que los campos no estén vacíos
-      if (!direccion || !celular || !categoria) {
+      if (!direccion || !celular || !categorias) {
         return res.status(400).json({ message: 'Faltan campos por llenar' });
       }
+
 
       // Validar que el celular no esté vinculado a otra cuenta, excluyendo al usuario actual
       const celularExist = await pool.query(
@@ -55,49 +56,74 @@ async function change_data(req, res) {
       }
 
 
+      //Si no tiene categorías, no elimina
+      const existingCategories = await pool.query('SELECT * FROM categoria_res WHERE id_restaurante = $1', [id]);
+
       // Delete existing categories
-      await pool.query('DELETE FROM categoria_restaurante WHERE id_restaurante = $1', [id]);
+      if (existingCategories.rows.length > 0) {
+        await pool.query('DELETE FROM categoria_res WHERE id_restaurante = $1', [id]);
+      }
 
       // Add new main category
-      await pool.query(
-        'INSERT INTO categoria_restaurante(id_restaurante, id_categoria) VALUES ($1, $2)',
-        [id, categorias.main]
-      );
+      if (categorias.main) {
+        await pool.query(
+          'INSERT INTO categoria_res(id_restaurante, id_categoria) VALUES ($1, $2)',
+          [id, categorias.main]
+        );
+      }
 
       // Add new secondary category
-      await pool.query(
-        'INSERT INTO categoria_restaurante(id_restaurante, id_categoria) VALUES ($1, $2)',
-        [id, categorias.secondary]
-      );
+      if (categorias.secondary) {
+        await pool.query(
+          'INSERT INTO categoria_res(id_restaurante, id_categoria) VALUES ($1, $2)',
+          [id, categorias.secondary]
+        );
+      }
 
       // Actualizar informacion en la base de datos
-      const {barrio, tipoVia, ciudad, departamento, numAddress, firstNumAddress, secondNumAddress} = direccion;
+      const { barrio, tipoVia, ciudad, departamento, numAddress, firstNumAddress, secondNumAddress } = direccion;
       const observaciones = direccion.observaciones || '';
 
       if (
-          !barrio ||
-          !tipoVia ||
-          !ciudad ||
-          !departamento ||
-          !numAddress ||
-          !firstNumAddress ||
-          !secondNumAddress
-        ) {
-          return res.status(400).json({ message: 'Faltan campos por llenar' });
-        }
-      
-      // Crear nueva direccion en la base de datos
-      const id_dir = await pool.query(`
-      INSER INTO direccion(departamento, ciudad, barrio, tipo_via, numero_via, numero_uno, numero_dos, observaciones)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
-      `,
-      [departamento, ciudad, barrio, tipoVia, numAddress, firstNumAddress, secondNumAddress, observaciones]
+        !barrio ||
+        !tipoVia ||
+        !ciudad ||
+        !departamento ||
+        !numAddress ||
+        !firstNumAddress ||
+        !secondNumAddress
+      ) {
+        return res.status(400).json({ message: 'Faltan campos por llenar' });
+      }
+
+      //verificar si tiene direccion en direccion_usuario
+      const addressExist = await pool.query(
+        'SELECT * FROM direccion_usuario WHERE id_usuario = $1',
+        [id]
       );
 
-      //Crear la relación en direccion_usuario
-      await pool.query(`
-      INSERT INTO direccion_usuario(id_usuario, id_direccion)`
-      , [id, id_dir.rows[0].id])
+      //id de la direccion
+      const id_dir = addressExist.rows[0].id_direccion;
+
+      if (addressExist.rows.length > 0) {
+        // Update address in the database
+        await pool.query(
+          `UPDATE direccion SET departamento=$1, ciudad=$2, barrio=$3, tipo_via=$4, numero_via=$5, numero_uno=$6, numero_dos=$7, observaciones=$8
+          WHERE id = $9`,
+          [departamento, ciudad, barrio, tipoVia, numAddress, firstNumAddress, secondNumAddress, observaciones, id_dir]
+        );
+      } else {
+        // Crear nueva direccion en la base de datos
+        const id_dir = await pool.query(`INSERT INTO direccion(departamento, ciudad, barrio, tipo_via, numero_via, numero_uno, numero_dos, observaciones)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+          [departamento, ciudad, barrio, tipoVia, numAddress, firstNumAddress, secondNumAddress, observaciones]
+        );
+
+        //Crear la relación en direccion_usuario
+        await pool.query(`INSERT INTO direccion_usuario(id_usuario, id_direccion) VALUES ($1, $2)`, [id, id_dir.rows[0].id]);
+      }
+
+
     }
     res.json({ message: 'Actualizacion de datos exitosa' });
   } catch (e) {

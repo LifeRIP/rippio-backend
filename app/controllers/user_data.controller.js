@@ -78,16 +78,27 @@ async function getById(req, res) {
       const response = await pool.query(
         `SELECT du.id, du.identificacion, du.nombre, du.apellido, du.email, du.telefono, du.tipo_usuario, du.img_icon, du.estado, du.creditos, 
         r.calificacion, r.img_banner,
-		    dir.departamento, dir.ciudad, dir.barrio, dir.tipo_via, dir.numero_via, dir.numero_uno, dir.numero_dos, dir.observaciones
-		    FROM datos_usuarios du
+		    dir.departamento, dir.ciudad, dir.barrio, dir.tipo_via, dir.numero_via, dir.numero_uno, dir.numero_dos, dir.observaciones,
+		    cr.id_categoria    
+			FROM datos_usuarios du
 		    inner join restaurante r on du.id = r.id
-			  inner join direccion_usuario diru on diru.id_usuario = r.id
-			  inner join direccion dir on diru.id_direccion = dir.id
+			inner join direccion_usuario diru on diru.id_usuario = r.id
+			inner join direccion dir on diru.id_direccion = dir.id
+			inner join categoria_res cr on cr.id_restaurante = r.id
         WHERE du.id = $1`,
         [id]
       );
 
-      res.status(200).json(response.rows);
+      //como retorna dos tuplas donde lo unico que cambia es la categoria, se debe hacer un arreglo con las categorias
+
+      let categorias = [];
+      response.rows.forEach((element) => {
+        categorias.push(element.id_categoria);
+      });
+
+      response.rows[0].id_categoria = categorias;
+      res.json(response.rows[0]);
+
       return;
     }
   } catch (error) {
