@@ -247,7 +247,9 @@ async function add_address(req, res) {
       [id, newAddress.rows[0].id]
     );
 
-    res.json({ message: 'Nueva direccion agregada exitosamente' });
+    
+    // Enviar respuesta y la id de la nueva direccion
+  res.json({ message: 'Nueva direccion agregada exitosamente', id: newAddress.rows[0].id });
   } catch (e) {
     res
       .status(500)
@@ -325,6 +327,7 @@ async function modify_address(req, res) {
     );
     res.json({ message: 'La direccion se modificó exitosamente' });
   } catch (e) {
+    console.log(e);
     res
       .status(500)
       .json({ message: 'Ha ocurrido un error al modificar la direccion' });
