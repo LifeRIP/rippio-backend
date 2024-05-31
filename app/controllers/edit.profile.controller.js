@@ -331,6 +331,52 @@ async function modify_address(req, res) {
   }
 }
 
+async function delete_address(req, res) {
+  try {
+    // Obtener el id del usuario despues de pasar por el middleware de autenticacion
+    const { id } = req.user;
+
+    const { id_direccion } = req.body;
+
+    // Validar que los campos no estén vacíos
+    if (!id_direccion) {
+      return res.status(400).json({ message: 'Faltan campos por llenar' });
+    }
+
+    // Validar que la direccion exista
+    const addressExist = await pool.query(
+      'SELECT * FROM direccion WHERE id = $1',
+      [id_direccion]
+    );
+
+    if (addressExist.rows.length === 0) {
+      return res.status(400).json({ message: 'La direccion no existe' });
+    }
+
+    //Validar que la direccion pertenezca al usuario
+    const address = await pool.query(
+      'SELECT * FROM direccion_usuario WHERE id_usuario = $1 AND id_direccion = $2',
+      [id, id_direccion]
+    );
+
+    if (address.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ message: 'La direccion no pertenece al usuario' });
+    }
+
+    // Elimina direccion en la base de datos
+    await pool.query('DELETE FROM direccion WHERE id = $1', [id_direccion]);
+    res.json({ message: 'La direccion se eliminó exitosamente' });
+  }
+  catch (e) {
+    res
+      .status(500)
+      .json({ message: 'Ha ocurrido un error al eliminar la direccion' });
+  }
+}
+
+
 async function getAddressById(req, res) {
   try {
     // Obtener el id del usuario despues de pasar por el middleware de autenticacion
@@ -671,6 +717,7 @@ module.exports = {
   change_password,
   add_address,
   modify_address,
+  delete_address,
   getAddressById,
   modify_profile_image,
   modify_banner_restaurant,

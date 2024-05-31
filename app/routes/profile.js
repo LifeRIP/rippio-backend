@@ -6,6 +6,7 @@ const {
   change_password,
   add_address,
   modify_address,
+  delete_address,
   getAddressById,
   modify_profile_image,
   modify_banner_restaurant,
@@ -19,6 +20,7 @@ router.post('/edit', auth_user, change_data); // /api/profile/edit
 router.post('/change_password', auth_user, change_password); // /api/profile/change_password
 router.post('/add_address', auth_user, add_address); // /api/profile/add_address
 router.post('/modify_address', auth_user, modify_address); // /api/profile/modify_address
+router.post('/delete_address', auth_user, delete_address); // /api/profile/delete_address
 router.get('/get_address_by_id', auth_user, getAddressById); // /api/profile/get_address_by_id
 router.post('/modify_profile_image', auth_user, modify_profile_image); // /api/profile/modify_profile_image
 router.post('/modify_banner_restaurant', auth_user, modify_banner_restaurant); // /api/profile/modify_banner_restaurant
