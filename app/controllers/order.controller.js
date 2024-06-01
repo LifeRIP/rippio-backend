@@ -2,6 +2,168 @@ const { pool } = require('../database/dbConfig');
 const moment = require('moment');
 moment.locale('es');
 
+async function add_order(req, res) {
+  try {
+
+    const { id } = req.user;
+
+    const {  
+      observations,
+      id_payment_method,
+      id_address,
+      use_credits,
+    } = req.body;
+
+    let total_cost ;
+    let credits_result ;
+
+    //Validar que los campos no estén vacíos
+    if (
+      !observations ||
+      !id_payment_method ||
+      !id_address ||
+      !use_credits
+    ) {
+      return res.status(400).json({ error: 'Por favor complete todos los campos' });
+    }
+
+    // Verificar si el carrito del usuario no está vacío
+
+    const cart = await pool.query(
+      `SELECT * FROM carrito WHERE id_usuario = $1`,
+      [id]
+    );
+
+    if (cart.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ error: 'No hay productos en el carrito' });
+    }
+
+    // Verificar si la dirección del usuario existe
+
+    const address = await pool.query(
+      `SELECT * FROM direccion_usuario WHERE id_direccion = $1 and id_usuario = $2`,
+      [id_address, id]
+    );
+
+    if (address.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ error: 'La dirección no existe' });
+    }
+
+
+    // Verificar si el método de pago del usuario existe
+
+    const payment_method = await pool.query(
+      `SELECT * FROM detalles_metodo_pago WHERE id = $1 and id_usuario = $2`,
+      [id_payment_method, id]
+    );
+
+    if (payment_method.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ error: 'El método de pago no existe' });
+    }
+
+    // Calcular costo total del pedido
+    
+    const total = await pool.query(
+      `SELECT sum(cost_unit * cantidad_prod) as Costo_Total
+      FROM carrito C join producto P on C.id_producto = P.id
+      Where C.id_usuario = $1`,
+      [id]
+    );
+    
+    //Obtener cantidad de creditos del usuario
+    
+    if (use_credits) {
+      const credits = await pool.query(
+        `SELECT creditos FROM datos_usuarios WHERE id = $1`,
+        [id]
+      );
+
+      if (credits.rows[0].creditos <= 0) {
+        return res.status(400).json({ error: 'No puedes usar créditos' });
+      }
+
+      total_cost = total.rows[0].costo_total - credits.rows[0].creditos;
+
+      if (total_cost < 0) {
+
+        total_cost = 0;
+        credits_result = (total_cost * -1) + total_cost*0.1;	
+
+      }else {
+        credits_result = total_cost*0.1;
+      }
+
+    } else {
+
+       total_cost = total.rows[0].costo_total
+
+    }
+
+    // Obtener fehca del pedido
+
+    const date = moment().format('YYYY-MM-DD HH:mm:ss');
+
+    //Obtener el id del restaurante
+
+    const restaurant = await pool.query(
+      `SELECT distinct P.id_restaurante
+      FROM carrito C join producto P on C.id_producto = P.id
+      Where C.id_usuario = $1`,
+      [id]
+    );
+
+    const id_restaurant = restaurant.rows[0].id_restaurante
+
+  
+    // Crear el pedido
+    const newOrder = await pool.query(
+      `INSERT INTO pedido (id_usuario, id_restaurante,  id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, observaciones) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [id, id_restaurant, id_address, id_payment_method, 'Procesando',  date, total_cost, observations]
+    );  
+    
+    // Crear el detalle del pedido
+    for (let i = 0; i < cart.rows.length; i++) {
+      const Product_Value = await pool.query(
+        `SELECT cost_unit FROM producto WHERE id = $1`,
+        [cart.rows[i].id_producto]);
+        
+       await pool.query(
+        `INSERT INTO detalle_pedido (id_pedido, id_producto, costo_unit, cantidad_prod) VALUES ($1, $2, $3, $4)`,
+        [newOrder.rows[0].id, cart.rows[i].id_producto, Product_Value.rows[0].cost_unit  ,cart.rows[i].cantidad_prod]
+      );
+    }
+
+    // Eliminar el carrito
+    await pool.query(
+      `DELETE FROM carrito WHERE id_usuario = $1`,
+      [id]
+    );
+
+    // Actualizar los creditos del usuario
+
+    if (use_credits) {
+      await pool.query(
+        `UPDATE datos_usuarios SET creditos = $1 WHERE id = $2`,
+        [credits_result, id]
+      );
+    }
+
+    res.json({ message: 'Pedido creado correctamente' });
+
+  } catch (error) {
+    console.error(error.message);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al crear el pedido' });
+  }
+}
+
 async function getByUserID(req, res) {
   try {
     const id = req.params.id;
@@ -52,4 +214,4 @@ async function getByUserID(req, res) {
   }
 }
 
-module.exports = { getByUserID };
+module.exports = { add_order,getByUserID };
