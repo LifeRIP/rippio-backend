@@ -586,10 +586,7 @@ async function modify_payment_method(req, res) {
     }
 
     // Validar que la tarjeta exista
-    const cardExist = await pool.query(
-      'SELECT * FROM detalles_metodo_pago WHERE id = $1',
-      [id_metodo_pago]
-    );
+    
 
     if (cardExist.rows.length === 0) {
       return res.status(400).json({ message: 'La tarjeta no existe' });
@@ -715,6 +712,43 @@ async function get_type_payment_methods(req, res) {
   }
 }
 
+
+async function delete_payment_methods (req, res) {
+
+  try {
+    
+    const { id_usaurio } = req.user;
+    const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ message: 'Digite un id de tarjeta' });
+  } 
+
+  const paymentMethod = await pool.query(
+    'SELECT * FROM detalles_metodo_pago WHERE id = $1',
+    [id]
+  );
+
+    if (paymentMethod.rows.length > 0) {
+      const response = await pool.query(
+        `DELETE FROM detalles_metodo_pago WHERE id = $1 RETURNING *`,
+        [id]);
+        res.json({message: 'Tarjeta eliminada con éxito',response: response.rows[0]});
+  } else {
+    res.status(400).json({ message: 'Tarjeta no encontrada' });
+    console.log(error);
+    
+  }
+
+  } catch (error) {
+    res.status(500).json({ message: 'Ha ocurrido un error al eliminar la tarjeta' });
+  }
+}
+
+
+
+
+
 module.exports = {
   change_data,
   change_password,
@@ -728,4 +762,5 @@ module.exports = {
   modify_payment_method,
   get_payment_methods,
   get_type_payment_methods,
+  delete_payment_methods,
 };
