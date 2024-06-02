@@ -21,7 +21,6 @@ async function add_order(req, res) {
     if (
       !id_payment_method ||
       !id_address ||
-      !use_credits ||
       !shipping_cost
     ) {
       return res.status(400).json({ error: 'Por favor complete todos los campos' });
@@ -175,7 +174,8 @@ async function add_order(req, res) {
 
 async function getByUserID(req, res) {
   try {
-    const id = req.params.id;
+
+    const { id } = req.user;
     const response = await pool.query(
       `SELECT
       p.id,
@@ -222,5 +222,51 @@ async function getByUserID(req, res) {
       .json({ error: 'Ha ocurrido un error al obtener los pedidos' });
   }
 }
+
+async function getDetail(req, res) {
+
+  try {
+
+    const id_details_order = req.params.id;
+
+    const response = await pool.query(
+
+      `SELECT  dp.id_pedido, p.fecha,
+      pr.nombre, pr.descripcion, pr.img_product, pr.cost_unit, dp.cantidad_prod, (dp.costo_unit * dp.cantidad_prod) as total_prod,
+      d.departamento, d.ciudad, d.barrio, d.tipo_via, d.numero_via, d.numero_uno, d.numero_dos, d.observaciones,
+      pago.numero
+      FROM detalle_pedido dp
+      JOIN pedido p ON p.id = dp.id_pedido
+     JOIN producto pr ON pr.id = dp.id_producto
+     JOIN detalles_metodo_pago pago ON p.id_detalles_metodo_pago = pago.id
+      JOIN direccion d ON p.id_direccion = d.id
+      WHERE dp.id_pedido = $1`,
+      [id_details_order]
+    );
+    
+    if (response.rows === 0) {
+      return res
+        .status(404)
+        .json({ error: 'No se encontraron detalles para el pedido' });
+    }
+
+    response.rows.forEach((row) => {
+      let fechaFormateada = moment(row.fecha).format('MMM D, YYYY h:mm A');
+      row.fecha = fechaFormateada =
+        fechaFormateada.charAt(0).toUpperCase() +
+        fechaFormateada.slice(1).replace('.', '');
+    } );
+
+    res.json(response.rows);
+  }
+  catch (error) {
+    console.error(error.message);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los detalles del pedido' });
+  } 
+}
+
+
 
 module.exports = { add_order,getByUserID };
