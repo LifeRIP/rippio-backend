@@ -31,9 +31,9 @@ async function register(req, res) {
 
     // Validar que la identificación tenga mas de 15 caracteres
     if (identificacion.length > 15) {
-      return res
-        .status(400)
-        .json({ message: 'La identificación debe tener 15 caracteres como maximo' });
+      return res.status(400).json({
+        message: 'La identificación debe tener 15 caracteres como maximo',
+      });
     }
 
     // Validar que el telefono tenga 10 caracteres
@@ -45,7 +45,7 @@ async function register(req, res) {
 
     // Validar que el email no esté registrado
     const emailExist = await pool.query(
-      'SELECT * FROM datos_usuarios WHERE email = $1',
+      'SELECT * FROM datos_usuarios WHERE email ILIKE $1',
       [email]
     );
 
@@ -108,26 +108,15 @@ async function register(req, res) {
         `
         INSERT INTO restaurante
         (id, calificacion, img_banner, id_direccion) VALUES ($1, $2, $3, $4)`,
-        [id,
+        [
+          id,
           0,
           'https://firebasestorage.googleapis.com/v0/b/rippio.appspot.com/o/RestaurantBanner%2FbannerDefault.png?alt=media&token=b024c6e2-8e7b-4696-baf8-e7219b4c9268',
-          null]);
+          null,
+        ]
+      );
     }
-
-    // Crear token
-    // const token = await jwt.sign(
-    //   {
-    //     id,
-    //     tipo_usuario,
-    //   },
-    //   process.env.JWT_SECRET,
-    //   {
-    //     expiresIn: expiresIn, // 30 dias en segundos
-    //   }
-    // );
-
-    res.status(201).json({
-    });
+    res.status(201).json({});
   } catch (error) {
     console.error(error);
     res
@@ -147,7 +136,7 @@ async function login(req, res) {
 
     // Validar que el usuario exista
     const user = await pool.query(
-      'SELECT * FROM datos_usuarios WHERE email = $1',
+      'SELECT * FROM datos_usuarios WHERE email ILIKE $1',
       [email]
     );
 

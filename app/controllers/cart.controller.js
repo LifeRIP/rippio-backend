@@ -46,7 +46,7 @@ async function get(req, res) {
       inner join producto p on c.id_producto = p.id
       inner join datos_usuarios du on du.id = p.id_restaurante
       WHERE id_usuario = $1`,
-    [id_usuario]
+      [id_usuario]
     );
 
     // Verificar si el carrito tiene productos
@@ -55,7 +55,6 @@ async function get(req, res) {
     }
 
     res.json(cart.rows);
-
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: 'Error al obtener carrito' });
@@ -116,7 +115,7 @@ async function empty(req, res) {
 
     // Verificar si el carrito tiene productos
     if (result.rowCount === 0) {
-      return res.status(200).json({ message: 'Carrito vacío' });
+      return res.status(400).json({ message: 'Carrito vacío' });
     }
 
     res.json({ message: 'Carrito vaciado' });

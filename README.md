@@ -1,6 +1,6 @@
 # Rippio-Backend
 
-Repositorio para el código backend del proyecto Rippio.
+Repositorio para el código backend (API) del proyecto `Rippio`.
 
 ## Configuración del Entorno (PowerShell)
 
@@ -8,22 +8,30 @@ Antes de comenzar a trabajar en el proyecto, necesitas configurar tu entorno de 
 
 ### Prerrequisitos
 
-- [NVM](https://github.com/coreybutler/nvm-windows) (para utilizar la misma version de Node)
+- #### [NVM windows](https://github.com/coreybutler/nvm-windows) (para utilizar la misma version de Node)
 
   ```bash
-   nvm install $(Get-Content .nvmrc)
-   nvm use $(Get-Content .nvmrc)
+  nvm install
   ```
 
-- PNPM (recomendado)
+  #### o
+
+- #### [NVM sh](https://github.com/nvm-sh/nvm) (para utilizar la misma version de Node)
+
+  ```bash
+  nvm install $(Get-Content .nvmrc)
+  nvm use $(Get-Content .nvmrc)
+  ```
+
+- #### PNPM (recomendado)
 
   ```bash
   npm install -g pnpm
   ```
 
-  o
+  #### o
 
-- NPM
+- #### NPM
 
   ```bash
   npm install npm@latest -g
@@ -34,9 +42,9 @@ Antes de comenzar a trabajar en el proyecto, necesitas configurar tu entorno de 
 Configurar el entorno de desarrollo local:
 
 ```bash
-git clone https://github.com/LifeRIP/Rippio-Backend.git
+git clone https://github.com/LifeRIP/rippio-backend.git
 cd Rippio-Backend
-npm install
+pnpm install
 ```
 
 ### Ejecución en ambiente local
