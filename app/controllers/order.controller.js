@@ -119,6 +119,8 @@ async function add_order(req, res) {
     } else {
 
       total_cost = Number(total.rows[0].costo_total) + Number(shipping_cost);
+      
+      credits_result = total_cost*0.1;
 
     }
 
