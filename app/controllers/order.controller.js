@@ -26,6 +26,12 @@ async function add_order(req, res) {
       return res.status(400).json({ error: 'Por favor complete todos los campos' });
     }
 
+    // Validar que use_credits no sea undefined
+
+    if (use_credits === undefined) {
+      return res.status(400).json({ error: 'El campo use_credits es requerido' });
+    }
+
     // Validar que el campo use_credits sea booleano
     if (typeof use_credits !== 'boolean') {
       return res.status(400).json({ error: 'El campo use_credits debe ser booleano' });
