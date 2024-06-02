@@ -12,6 +12,7 @@ async function add_order(req, res) {
       id_address,
       use_credits,
       shipping_cost,
+      date
     } = req.body;
 
     let total_cost ;
@@ -21,7 +22,8 @@ async function add_order(req, res) {
     if (
       !id_payment_method ||
       !id_address ||
-      !shipping_cost
+      !shipping_cost ||
+      !date
     ) {
       return res.status(400).json({ error: 'Por favor complete todos los campos' });
     }
@@ -106,8 +108,9 @@ async function add_order(req, res) {
 
       if (total_cost < 0) {
 
+        credits_result = (total_cost * -1) + total_cost*0.1;
         total_cost = 0;
-        credits_result = (total_cost * -1) + total_cost*0.1;	
+        	
 
       }else {
         credits_result = total_cost*0.1;
@@ -118,10 +121,6 @@ async function add_order(req, res) {
        total_cost = total.rows[0].costo_total + shipping_cost;
 
     }
-
-    // Obtener fecha del pedido
-
-    const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
     //Obtener el id del restaurante
 
@@ -137,8 +136,8 @@ async function add_order(req, res) {
   
     // Crear el pedido
     const newOrder = await pool.query(
-      `INSERT INTO pedido (id_usuario, id_restaurante,  id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [id, id_restaurant, id_address, id_payment_method, 'Preparando',  date, total_cost]
+      `INSERT INTO pedido (id_usuario, id_restaurante,  id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, costo_envio) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [id, id_restaurant, id_address, id_payment_method, 'Preparando',  date, total_cost, shipping_cost]
     );  
     
     // Crear el detalle del pedido
