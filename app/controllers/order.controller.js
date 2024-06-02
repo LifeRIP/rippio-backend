@@ -144,7 +144,7 @@ async function add_order(req, res) {
         
        await pool.query(
         `INSERT INTO detalle_pedido (id_pedido, id_producto, costo_unit, cantidad_prod, observaciones) VALUES ($1, $2, $3, $4, $5)`,
-        [newOrder.rows[0].id, cart.rows[i].id_producto, Product_Value.rows[0].cost_unit  ,cart.rows[i].cantidad_prod, cart.rows[i].observaciones]
+        [newOrder.rows[0].id, cart.rows[i].id_producto, Product_Value.rows[0].cost_unit  ,cart.rows[i].cantidad_prod, cart.rows[i].observacion]
       );
     }
 
