@@ -18,7 +18,7 @@ CATEGORIA_RES (id-pk, id_restaurante, id_categoria)
 DATOS_USUARIOS (id-pk, identificacion, nombre, apellido, email, telefono, contraseña, tipo_usuario, img_icon, estado, creditos)
 	tipo_usuario -> ROL.id
 
-DETALLE_PEDIDO (id-pk, id_pedido, id_producto, costo_unit, cantidad_prod)
+DETALLE_PEDIDO (id-pk, id_pedido, id_producto, costo_unit, cantidad_prod, observaciones)
 	id_pedido -> PEDIDO.id
 	id_producto -> PRODUCTO.id
 
@@ -40,7 +40,7 @@ MENSAJE (id-pk, id_pedido, usuario_enviando, mensaje, fecha)
 		
 METODO_PAGO (id-pk, nombre)
 
-PEDIDO (id-pk, id_usuario, id_restaurante, id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, observaciones)
+PEDIDO (id-pk, id_usuario, id_restaurante, id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total)
 	id_usuario -> DATOS_USUARIOS.id
 	id_restaurante -> RESTAURANTE.id
 	id_direccion -> DIRECCION.id
