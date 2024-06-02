@@ -152,12 +152,6 @@ async function add_order(req, res) {
       );
     }
 
-    // Eliminar el carrito
-    await pool.query(
-      `DELETE FROM carrito WHERE id_usuario = $1`,
-      [id]
-    );
-
     // Actualizar los creditos del usuario
 
     if (use_credits) {
