@@ -108,7 +108,7 @@ async function add_order(req, res) {
 
       if (total_cost < 0) {
 
-        credits_result = (total_cost * -1) + total_cost*-0.1;
+        credits_result = total_cost * -1;
         total_cost = 0;
         	
 
