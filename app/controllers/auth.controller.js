@@ -116,7 +116,7 @@ async function register(req, res) {
         ]
       );
     }
-    res.status(201).json({});
+    res.status(201).json({ message: 'Usuario registrado con éxito' });
   } catch (error) {
     console.error(error);
     res
