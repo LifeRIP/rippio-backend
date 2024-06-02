@@ -18,12 +18,19 @@ function connectToDb() {
       console.log('Conexión exitosa a la base de datos');
       firstConnection = false;
     }
+    let released = false;
+    const release = () => {
+      if (!released) {
+        done();
+        released = true;
+      }
+    };
     client.on('end', () => {
-      done(); // Libera el cliente
+      release();
       connectToDb(); // Reintentar la conexión si se pierde
     });
     client.on('error', () => {
-      done(); // Libera el cliente
+      release();
       connectToDb(); // Reintentar la conexión si hay un error
     });
   });
