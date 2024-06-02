@@ -156,7 +156,6 @@ async function add_order(req, res) {
 
     // Actualizar los creditos del usuario
 
-    
     await pool.query(
       `UPDATE datos_usuarios SET creditos = $1 WHERE id = $2`,
       [credits_result, id]
@@ -168,7 +167,7 @@ async function add_order(req, res) {
     console.error(error.message);
     res
       .status(500)
-      .json({ error: 'Ha ocurrido un error al crear el pedido' });
+      .json({error, error: 'Ha ocurrido un error al crear el pedido' });
   }
 }
 
