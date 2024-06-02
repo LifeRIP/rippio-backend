@@ -154,12 +154,11 @@ async function add_order(req, res) {
 
     // Actualizar los creditos del usuario
 
-    if (use_credits) {
-      await pool.query(
-        `UPDATE datos_usuarios SET creditos = $1 WHERE id = $2`,
-        [credits_result, id]
-      );
-    }
+    
+    await pool.query(
+      `UPDATE datos_usuarios SET creditos = $1 WHERE id = $2`,
+      [credits_result, id]
+    );
 
     res.json({ message: 'Pedido creado correctamente' });
 
