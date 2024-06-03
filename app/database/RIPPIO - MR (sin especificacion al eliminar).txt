@@ -38,7 +38,7 @@ HORARIO (id-pk, id_restaurante, dia_semana, hora_apertura, hora_cierre)
 MENSAJE (id-pk, id_pedido, usuario_enviando, mensaje, fecha)
 	id_pedido -> PEDIDO.id
 		
-METODO_PAGO (id-pk, nombre)
+METODO_PAGO (id-pk, nombre, card_icon)
 
 PEDIDO (id-pk, id_usuario, id_restaurante, id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total)
 	id_usuario -> DATOS_USUARIOS.id
