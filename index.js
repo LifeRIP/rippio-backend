@@ -19,6 +19,9 @@ app.get('/', (req, res) =>
   res.sendFile(path.join(__dirname, '/app/pages/index.html'))
 );
 app.use('/api', router);
+app.get('/healthCheck', (req, res) => {
+  res.json({ status: 'OK' });
+});
 app.use('*', (req, res) => {
   res.status(404).json({ error: 'URL_NOT_FOUND' });
 });
