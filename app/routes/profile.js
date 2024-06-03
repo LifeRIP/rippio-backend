@@ -29,5 +29,5 @@ router.post('/add_payment_method', auth_user, add_payment_method); // /api/profi
 router.post('/modify_payment_method', auth_user, modify_payment_method); // /api/profile/modify_payment_method
 router.get('/get_payment_methods', auth_user, get_payment_methods); // /api/profile/get_payment_methods
 router.get('/get_type_payment_methods', auth_user, get_type_payment_methods); // /api/profile/get_type_payment_methods
-router.post('/delete_payment_methods', auth_user, delete_payment_methods); // /api/profile/delete_payment_methods
+router.delete('/delete_payment_methods', auth_user, delete_payment_methods); // /api/profile/delete_payment_methods
 module.exports = router;
