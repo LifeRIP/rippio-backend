@@ -242,11 +242,30 @@ async function add_address(req, res) {
         observaciones,
       ]
     );
-    await pool.query(
-      'INSERT INTO direccion_usuario(id_usuario, id_direccion) VALUES ($1, $2)',
-      [id, newAddress.rows[0].id]
+    // Crear la relación 
+    
+     //obtiene el tipo de usuario
+
+     const tipo_usuario = await pool.query(
+      'SELECT tipo_usuario FROM datos_usuarios WHERE id = $1',
+      [id]
     );
 
+    const valtipo_usuario = tipo_usuario.rows[0].tipo_usuario;
+
+
+    if (valtipo_usuario === 1 || valtipo_usuario === 2) {
+      await pool.query(
+        'INSERT INTO direccion_usuario(id_usuario, id_direccion) VALUES ($1, $2)',
+        [id, newAddress.rows[0].id]
+      );
+    }
+    else if (valtipo_usuario === 3) {
+      await pool.query(
+        'UPDATE restaurante SET id_direccion = $1 WHERE id = $2',
+        [newAddress.rows[0].id, id]
+      );
+    }
     
     // Enviar respuesta y la id de la nueva direccion
   res.json({ message: 'Nueva direccion agregada exitosamente', id: newAddress.rows[0].id });
@@ -310,6 +329,7 @@ async function modify_address(req, res) {
       return res.status(400).json({ message: 'La direccion no existe' });
     }
 
+    
     // Actualiza direccion en la base de datos
     await pool.query(
       'UPDATE direccion SET departamento=$1, ciudad=$2, barrio=$3, tipo_via=$4, numero_via=$5, numero_uno=$6, numero_dos=$7, observaciones=$8 WHERE id = $9',
