@@ -82,8 +82,7 @@ if (tipo_usuario.rows[0].tipo_usuario === 3) {
         cr.id_categoria    
         FROM datos_usuarios du
         LEFT JOIN restaurante r ON du.id = r.id
-        LEFT JOIN direccion_usuario diru ON diru.id_usuario = r.id
-        LEFT JOIN direccion dir ON diru.id_direccion = dir.id
+        LEFT JOIN direccion dir ON r.id_direccion = dir.id
         LEFT JOIN categoria_res cr ON cr.id_restaurante = r.id
         WHERE du.id = $1`,
         [id]
