@@ -96,9 +96,9 @@ async function change_data(req, res) {
         return res.status(400).json({ message: 'Faltan campos por llenar' });
       }
 
-      //verificar si tiene direccion en direccion_usuario
+      //verificar si tiene direccion en restaurante
       const addressExist = await pool.query(
-        'SELECT * FROM direccion_usuario WHERE id_usuario = $1',
+        'SELECT * FROM restaurante WHERE id = $1 and id_direccion IS NOT NULL',
         [id]
       );
 
@@ -121,7 +121,10 @@ async function change_data(req, res) {
         );
 
         //Crear la relación en direccion_usuario
-        await pool.query(`INSERT INTO direccion_usuario(id_usuario, id_direccion) VALUES ($1, $2)`, [id, id_dir.rows[0].id]);
+        await pool.query(
+          'UPDATE restaurante SET id_direccion = $1 WHERE id = $2',
+          [id_dir.rows[0].id, id]
+        );
       }
 
 
