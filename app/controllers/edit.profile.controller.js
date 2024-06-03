@@ -534,7 +534,7 @@ async function add_payment_method(req, res) {
       'INSERT INTO detalles_metodo_pago(id_usuario, id_metodo_pago, nombre, apellido, numero, expiracion, cvv) VALUES ($1, $2, $3, $4, $5, $6, $7) returning *',
       [
         id,
-        Id_tipoTarjeta.rows[0].id,
+        Id_tipoTarjeta,
         nombre,
         apellido,
         cardNumber,
