@@ -461,7 +461,7 @@ async function add_payment_method(req, res) {
     const { id } = req.user;
 
     const {
-      tipo_tarjeta,
+      Id_tipoTarjeta,
       nombre,
       apellido,
       numero_tarjeta,
@@ -471,7 +471,7 @@ async function add_payment_method(req, res) {
 
     // Validar que los campos no estén vacíos
     if (
-      !tipo_tarjeta ||
+      !Id_tipoTarjeta ||
       !nombre ||
       !apellido ||
       !numero_tarjeta ||
@@ -480,12 +480,6 @@ async function add_payment_method(req, res) {
     ) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
-
-    // Conseguir Id del tipo de tarjeta
-    const Id_tipoTarjeta = await pool.query(
-      'SELECT * FROM metodo_pago WHERE nombre = $1',
-      [tipo_tarjeta]
-    );
 
     // Validar que el tipo de tarjeta exista
     if (Id_tipoTarjeta.rows.length === 0) {
