@@ -525,7 +525,7 @@ async function add_payment_method(req, res) {
     }
     
     // Crear nueva tarjeta en la base de datos
-    await pool.query(
+     const new_credit_card = await pool.query(
       'INSERT INTO detalles_metodo_pago(id_usuario, id_metodo_pago, nombre, apellido, numero, expiracion, cvv) VALUES ($1, $2, $3, $4, $5, $6, $7) returning *',
       [
         id,
@@ -538,7 +538,7 @@ async function add_payment_method(req, res) {
       ]
     );
 
-    res.json({ message: 'Nueva tarjeta agregada exitosamente' });
+    res.json({ message: 'Nueva tarjeta agregada exitosamente', id: new_credit_card.rows[0].id});
   } catch (e) {
     res
       .status(500)
