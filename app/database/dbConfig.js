@@ -13,26 +13,15 @@ let firstConnection = true;
 
 function connectToDb() {
   pool.connect((err, client, done) => {
-    if (err) throw err;
+    if (err) console.error('Error al conectarse a la base de datos', err);
     if (firstConnection) {
       console.log('Conexión exitosa a la base de datos');
       firstConnection = false;
     }
-    let released = false;
-    const release = () => {
-      if (!released) {
-        done();
-        released = true;
-      }
-    };
-    client.on('end', () => {
-      release();
-      connectToDb(); // Reintentar la conexión si se pierde
-    });
-    client.on('error', () => {
-      release();
-      connectToDb(); // Reintentar la conexión si hay un error
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      client.on('end', connectToDb); // Reintentar la conexión si se pierde
+      client.on('error', connectToDb); // Reintentar la conexión si hay un error
+    }
   });
 }
 
