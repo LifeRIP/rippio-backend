@@ -481,11 +481,6 @@ async function add_payment_method(req, res) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
 
-    // Validar que el tipo de tarjeta exista
-    if (Id_tipoTarjeta.rows.length === 0) {
-      return res.status(400).json({ message: 'El tipo de tarjeta no existe' });
-    }
-
     // Validar que la fecha de vencimiento sea valida
     const date = new Date();
     const currentYear = date.getFullYear();
@@ -498,7 +493,7 @@ async function add_payment_method(req, res) {
     ) {
       return res.status(400).json({ message: 'La tarjeta ha expirado' });
     }
-
+    
     // Validar que el cvv sea un numero de 3 digitos
     if (cvv.length !== 3 || isNaN(cvv)) {
       return res
@@ -528,7 +523,7 @@ async function add_payment_method(req, res) {
         .status(400)
         .json({ message: 'El numero de tarjeta es invalido' });
     }
-
+    
     // Crear nueva tarjeta en la base de datos
     await pool.query(
       'INSERT INTO detalles_metodo_pago(id_usuario, id_metodo_pago, nombre, apellido, numero, expiracion, cvv) VALUES ($1, $2, $3, $4, $5, $6, $7) returning *',
