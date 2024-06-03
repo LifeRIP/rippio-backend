@@ -103,11 +103,10 @@ async function getInfoById(req, res) {
       h.hora_apertura,
       h.hora_cierre
       FROM datos_usuarios du
-      inner join restaurante r on r.id = du.id
-      inner join direccion_usuario dir on r.id = dir.id_usuario
-      inner join direccion d on d.id = dir.id_direccion
-      inner join horario h on h.id_restaurante = r.id
-      where du.id=$1`,
+      left join restaurante r on r.id = du.id
+      left join direccion d on d.id = r.id_direccion
+      left join horario h on h.id_restaurante = r.id
+      where du.id= $1`,
       [id]
     );
 
