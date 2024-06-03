@@ -706,28 +706,41 @@ async function delete_payment_methods (req, res) {
 
   try {
     
-    const { id_usaurio } = req.user;
-    const { id } = req.body;
+    const { id } = req.user;
+    const { id_credit_card } = req.body;
 
-  if (!id) {
-    return res.status(400).json({ message: 'Digite un id de tarjeta' });
-  } 
+    // Validar que los campos no estén vacíos
 
-  const paymentMethod = await pool.query(
-    'SELECT * FROM detalles_metodo_pago WHERE id = $1',
-    [id]
-  );
+    if (!id_credit_card) {
+      return res.status(400).json({ message: 'Digite un id de tarjeta' });
+    } 
 
-    if (paymentMethod.rows.length > 0) {
-      const response = await pool.query(
-        `DELETE FROM detalles_metodo_pago WHERE id = $1 RETURNING *`,
-        [id]);
-        res.json({message: 'Tarjeta eliminada con éxito',response: response.rows[0]});
-  } else {
-    res.status(400).json({ message: 'Tarjeta no encontrada' });
-    console.log(error);
+    // Validar que la tarjeta exista
+    const paymentMethod = await pool.query(
+      'SELECT * FROM detalles_metodo_pago WHERE id = $1',
+      [id]
+    );
+
+    if (paymentMethod.rows.length === 0) {
+      return res.status(400).json({ message: 'Tarjeta no encontrada' });
+    }
+
+    // Validar que la tarjeta pertenezca al usuario
+
+    const card = await pool.query(
+      'SELECT * FROM detalles_metodo_pago WHERE id_usuario = $1 AND id = $2',
+      [id, id_credit_card]
+    );
     
-  }
+    if (card.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ message: 'La tarjeta no pertenece al usuario' });
+    }
+
+    // Elimina tarjeta en la base de datos
+    await pool.query('DELETE FROM detalles_metodo_pago WHERE id = $1', [id_credit_card]);
+    res.json({ message: 'La tarjeta se eliminó exitosamente' });
 
   } catch (error) {
     res.status(500).json({ message: 'Ha ocurrido un error al eliminar la tarjeta' });
