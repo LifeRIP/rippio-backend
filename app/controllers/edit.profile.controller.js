@@ -718,7 +718,7 @@ async function delete_payment_methods (req, res) {
     // Validar que la tarjeta exista
     const paymentMethod = await pool.query(
       'SELECT * FROM detalles_metodo_pago WHERE id = $1',
-      [id]
+      [id_credit_card]
     );
 
     if (paymentMethod.rows.length === 0) {
@@ -737,17 +737,18 @@ async function delete_payment_methods (req, res) {
         .status(400)
         .json({ message: 'La tarjeta no pertenece al usuario' });
     }
-
+    
     // Elimina tarjeta en la base de datos
     await pool.query('DELETE FROM detalles_metodo_pago WHERE id = $1', [id_credit_card]);
     res.json({ message: 'La tarjeta se eliminó exitosamente' });
 
   } catch (error) {
-    res.status(500).json({ message: 'Ha ocurrido un error al eliminar la tarjeta' });
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: 'Ha ocurrido un error al eliminar la tarjeta' });
   }
 }
-
-
 
 
 
