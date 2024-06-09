@@ -1,6 +1,4 @@
 const { pool } = require('../database/dbConfig');
-const moment = require('moment');
-moment.locale('es');
 
 async function add_order(req, res) {
   try {
@@ -354,5 +352,6 @@ async function orderRestaurant(req, res) {
       .json({ error: 'Ha ocurrido un error al obtener los pedidos' });
   }
 }
+
 
 module.exports = { add_order,getByUserID,getDetail,orderStatus,orderRestaurant };
