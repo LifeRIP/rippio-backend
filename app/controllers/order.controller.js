@@ -227,7 +227,16 @@ async function getDetail(req, res) {
 
   try {
 
-    const id_details_order = req.params.id;
+    const {id_details_order} = req.body;
+  
+    //Validar que los campos no estén vacíos
+    if (!id_details_order) {
+      return res
+        .status(400)
+        .json({ error: 'Por favor complete todos los campos' });
+    }
+
+    // Obtener los detalles del pedido
 
     const response = await pool.query(
 
@@ -244,11 +253,15 @@ async function getDetail(req, res) {
       [id_details_order]
     );
     
-    if (response.rows === 0) {
+    // Validar si el pedido no existe
+    
+    if (response.rows.length === 0) {
       return res
         .status(404)
         .json({ error: 'No se encontraron detalles para el pedido' });
     }
+
+    // Formatear la fecha
 
     response.rows.forEach((row) => {
       let fechaFormateada = moment(row.fecha).format('MMM D, YYYY h:mm A');
@@ -269,4 +282,4 @@ async function getDetail(req, res) {
 
 
 
-module.exports = { add_order,getByUserID };
+module.exports = { add_order,getByUserID,getDetail };
