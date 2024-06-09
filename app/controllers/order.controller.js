@@ -15,6 +15,7 @@ async function add_order(req, res) {
     } = req.body;
 
     let total_cost ;
+    let credits_used ;
     let credits_result ;
 
     //Validar que los campos no estén vacíos
@@ -104,21 +105,28 @@ async function add_order(req, res) {
         return res.status(400).json({ error: 'No puedes usar créditos' });
       }
 
+      credits_used =
+
       total_cost = Number(total.rows[0].costo_total) - Number(credits.rows[0].creditos) + Number(shipping_cost);
 
       if (total_cost < 0) {
 
+        credits_used = Number(credits.rows[0].creditos) + total_cost;
         credits_result = Math.floor(total_cost * -1);
         total_cost = 0;
         	
 
       }else {
+        credits_used = Number(credits.rows[0].creditos);
+
         credits_result = total_cost*0.1;
       }
 
     } else {
 
       total_cost = Number(total.rows[0].costo_total) + Number(shipping_cost);
+
+      credits_used = 0;
 
       credits_result = Math.floor(total_cost * 0.1) + Number(credits.rows[0].creditos);
 
@@ -138,8 +146,8 @@ async function add_order(req, res) {
   
     // Crear el pedido
     const newOrder = await pool.query(
-      `INSERT INTO pedido (id_usuario, id_restaurante,  id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, costo_envio) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [id, id_restaurant, id_address, id_payment_method, 'Preparando',  date, total_cost, shipping_cost]
+      `INSERT INTO pedido (id_usuario, id_restaurante,  id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, costo_envio, creditos_usados) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [id, id_restaurant, id_address, id_payment_method, 'Preparando',  date, total_cost, shipping_cost, credits_used]
     );  
     
     // Crear el detalle del pedido
@@ -180,6 +188,8 @@ async function getByUserID(req, res) {
       p.id,
       r.nombre,
       p.costo_total,
+      p.costo_envio,
+      p.creditos_usados,
       p.estado,
       p.fecha,
       json_agg(
