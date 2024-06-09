@@ -1,3 +1,4 @@
+const { json } = require('express');
 const { pool } = require('../database/dbConfig');
 
 async function add_order(req, res) {
@@ -232,8 +233,8 @@ async function getDetail(req, res) {
     const response = await pool.query(
 
       `SELECT  dp.id_pedido, p.fecha,
-      pr.nombre, pr.descripcion, pr.img_product, dp.costo_unit, dp.cantidad_prod, (dp.costo_unit * dp.cantidad_prod) as total_prod,
-      d.departamento, d.ciudad, d.barrio, d.tipo_via, d.numero_via, d.numero_uno, d.numero_dos, d.observaciones,
+      pr.nombre, pr.descripcion, pr.img_product, dp.observaciones as ObservacionP, dp.costo_unit, dp.cantidad_prod, (dp.costo_unit * dp.cantidad_prod) as total_prod,
+      d.departamento, d.ciudad, d.barrio, d.tipo_via, d.numero_via, d.numero_uno, d.numero_dos, d.observaciones as ObservacionD,
       pago.numero
       FROM detalle_pedido dp
       JOIN pedido p ON p.id = dp.id_pedido
@@ -353,33 +354,71 @@ async function orderRestaurant(req, res) {
   }
 }
 
-async function getDatilsRestaurant(req, res) {
+async function getDetailsRestaurant(req, res) {
   try {
 
     const { id } = req.user;
+    const { id_order } = req.query;
 
-    response = await pool.query(
-      `SELECT dp.id_pedido,p.estado, p.fecha,
-              (Du.nombre || ' ' || Du.apellido) as cliente,
-              (d.tipo_via || ' ' || d.numero_via || ' #' || d.numero_uno || ' - ' || d.numero_dos || ' ' || d.barrio) as direccion,
-              p.costo_total,
-      	      p.costo_envio,
-              (p.costo_total - costo_envio) as subtotal
-      FROM detalle_pedido dp
- 	      JOIN pedido p ON p.id = dp.id_pedido
-        JOIN datos_usuarios Du ON DU.id = p.id_usuario
-        JOIN direccion d ON d.id = p.id_direccion
-      WHERE p.id_restaurante = $1`,
-      [id]
+    // Validar que los campos no estén vacíos
+    if (!id_order) {
+      return res
+        .status(400)
+        .json({ error: 'Por favor complete todos los campos' });
+    }
+
+    //Validar que el pedido pertenezca al restaurante
+
+    const order = await pool.query(
+      `SELECT * FROM pedido WHERE id = $1 and id_restaurante = $2`,
+      [id_order, id]
     );
 
-    if (response.rows.length === 0) {
+    if (order.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ error: 'El pedido no existe o no pertenece al restaurante' });
+    }
+
+    // Obtener los detalles del pedido
+
+    response_data = await pool.query(
+      `SELECT p.estado, p.fecha,
+		          Du.nombre, Du.apellido,
+		          (d.tipo_via || ' ' || d.numero_via || ' #' || d.numero_uno || ' - ' || d.numero_dos || ' ' || d.barrio) as direccion,
+		          p.costo_total,
+      	      p.costo_envio,
+		          (p.costo_total - costo_envio) as subtotal
+      FROM detalle_pedido dp
+ 	      JOIN pedido p ON p.id = dp.id_pedido
+	      JOIN datos_usuarios Du ON DU.id = p.id_usuario
+	      JOIN direccion d ON d.id = p.id_direccion
+      WHERE p.id = $1`,
+      [id_order]
+    );
+
+    response_products = await pool.query(
+      `SELECT pr.img_product, pr.nombre, pr.descripcion,
+		          dp.observaciones, dp.cantidad_prod, dp.costo_unit, (dp.cantidad_prod * dp.costo_unit) as subtotal	
+      FROM pedido p
+ 	      JOIN detalle_pedido dp ON p.id = dp.id_pedido
+	      JOIN producto pr ON pr.id = dp.id_producto
+      WHERE p.id =  $1`,
+      [id_order]
+    );
+
+    if (response_data.rows.length === 0 || response_products.rows.length === 0) {
       return res
         .status(404)
         .json({ error: 'No se encontraron pedidos para el restaurante' });
     }
 
-    res.json(response.rows);
+    json_response = {
+      data: response_data.rows,
+      products: response_products.rows
+    }
+
+    res.json(json_response);
   }
     
   catch (error) {
@@ -390,4 +429,4 @@ async function getDatilsRestaurant(req, res) {
   }
 }
 
-module.exports = { add_order,getByUserID,getDetail,orderStatus,orderRestaurant };
+module.exports = { add_order,getByUserID,getDetail,orderStatus,orderRestaurant, getDetailsRestaurant };
