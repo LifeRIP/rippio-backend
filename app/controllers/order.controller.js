@@ -207,13 +207,6 @@ async function getByUserID(req, res) {
         .json({ error: 'No se encontraron pedidos para el usuario' });
     }
 
-    response.rows.forEach((row) => {
-      let fechaFormateada = moment(row.fecha).format('MMM D, YYYY h:mm A');
-      row.fecha = fechaFormateada =
-        fechaFormateada.charAt(0).toUpperCase() +
-        fechaFormateada.slice(1).replace('.', '');
-    });
-
     res.json(response.rows);
   } catch (error) {
     console.error(error.message);
@@ -261,15 +254,6 @@ async function getDetail(req, res) {
         .json({ error: 'No se encontraron detalles para el pedido' });
     }
 
-    // Formatear la fecha
-
-    response.rows.forEach((row) => {
-      let fechaFormateada = moment(row.fecha).format('MMM D, YYYY h:mm A');
-      row.fecha = fechaFormateada =
-        fechaFormateada.charAt(0).toUpperCase() +
-        fechaFormateada.slice(1).replace('.', '');
-    } );
-
     res.json(response.rows);
   }
   catch (error) {
@@ -280,6 +264,59 @@ async function getDetail(req, res) {
   } 
 }
 
+async function orderStatus(req, res) {
+  try {
+
+    const { id } = req.user;
+    const { id_order, status } = req.body;
+
+    // Validar que los campos no estén vacíos
+    if (!id_order || !status) {
+      return res
+        .status(400)
+        .json({ error: 'Por favor complete todos los campos' });
+    }
+
+    // Validar que el campo status sea un string
+    if (typeof status !== 'string') {
+      return res
+        .status(400)
+        .json({ error: 'El campo status debe ser un string' });
+    }
+
+    // Validar que el campo status tenga un valor válido
+    if (status !== 'Pendiente' && status !== 'Preparando' && status !== 'En camino' && status !== 'Entregado' && status !== 'Cancelado') {
+      return res
+        .status(400)
+        .json({ error: 'El campo status debe ser Pendiente, Preparando, En camino, Entregado o Entregado' });
+    }
+
+    // Verificar si el pedido pertenece al restaurante
+    const order = await pool.query(
+      `SELECT * FROM pedido WHERE id = $1 and id_restaurante = $2`,
+      [id_order, id]
+    );
+
+    if (order.rows.length === 0) {
+      return res
+        .status(400)
+        .json({ error: 'El pedido no existe o no pertenece al restaurante' });
+    }
+
+    // Actualizar el estado del pedido
+    await pool.query(
+      `UPDATE pedido SET estado = $1 WHERE id = $2`,
+      [status, id_order]
+    );
+
+    res.json({ message: 'Estado del pedido actualizado correctamente' });
+  } catch (error) {
+    console.error(error.message);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al actualizar el estado del pedido' });
+  }
+}
 
 
-module.exports = { add_order,getByUserID,getDetail };
+module.exports = { add_order,getByUserID,getDetail,orderStatus };
