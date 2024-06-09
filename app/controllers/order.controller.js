@@ -234,7 +234,7 @@ async function getDetail(req, res) {
     const response = await pool.query(
 
       `SELECT  dp.id_pedido, p.fecha,
-      pr.nombre, pr.descripcion, pr.img_product, pr.cost_unit, dp.cantidad_prod, (dp.costo_unit * dp.cantidad_prod) as total_prod,
+      pr.nombre, pr.descripcion, pr.img_product, dp.costo_unit, dp.cantidad_prod, (dp.costo_unit * dp.cantidad_prod) as total_prod,
       d.departamento, d.ciudad, d.barrio, d.tipo_via, d.numero_via, d.numero_uno, d.numero_dos, d.observaciones,
       pago.numero
       FROM detalle_pedido dp
