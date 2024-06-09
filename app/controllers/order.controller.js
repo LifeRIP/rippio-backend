@@ -147,7 +147,7 @@ async function add_order(req, res) {
     // Crear el pedido
     const newOrder = await pool.query(
       `INSERT INTO pedido (id_usuario, id_restaurante,  id_direccion, id_detalles_metodo_pago, estado, fecha, costo_total, costo_envio, creditos_usados) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-      [id, id_restaurant, id_address, id_payment_method, 'Preparando',  date, total_cost, shipping_cost, credits_used]
+      [id, id_restaurant, id_address, id_payment_method, 'Pendiente',  date, total_cost, shipping_cost, credits_used]
     );  
     
     // Crear el detalle del pedido
@@ -333,17 +333,17 @@ async function orderRestaurant(req, res) {
     const { id } = req.user;
 
     response = await pool.query(
-      `SELECT dp.id_pedido,p.estado, p.fecha,
+      `SELECT distinct p.id,p.estado, p.fecha,
 		          (Du.nombre || ' ' || Du.apellido) as cliente,
 		          (d.tipo_via || ' ' || d.numero_via || ' #' || d.numero_uno || ' - ' || d.numero_dos || ' ' || d.barrio) as direccion,
-		          p.costo_total,
+		          (p.costo_total + p.creditos_usados) as costo_total,
       	      p.costo_envio,
-		          (p.costo_total - costo_envio) as subtotal
+		          (p.costo_total + p.creditos_usados - p.costo_envio) as subtotal
       FROM detalle_pedido dp
  	      JOIN pedido p ON p.id = dp.id_pedido
 	      JOIN datos_usuarios Du ON DU.id = p.id_usuario
 	      JOIN direccion d ON d.id = p.id_direccion
-      WHERE p.id_restaurante = $1`,
+		  WHERE p.id_restaurante = $1`,
       [id]
     );
 
