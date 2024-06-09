@@ -383,7 +383,8 @@ async function getDetailsRestaurant(req, res) {
     // Obtener los detalles del pedido
 
     response_data = await pool.query(
-      `SELECT p.estado, p.fecha,
+      `SELECT distinct
+              p.estado, p.fecha,
 		          Du.nombre, Du.apellido,
 		          (d.tipo_via || ' ' || d.numero_via || ' #' || d.numero_uno || ' - ' || d.numero_dos || ' ' || d.barrio) as direccion,
 		          p.costo_total,
