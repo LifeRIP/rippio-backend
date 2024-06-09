@@ -336,9 +336,9 @@ async function orderRestaurant(req, res) {
       `SELECT distinct p.id,p.estado, p.fecha,
 		          (Du.nombre || ' ' || Du.apellido) as cliente,
 		          (d.tipo_via || ' ' || d.numero_via || ' #' || d.numero_uno || ' - ' || d.numero_dos || ' ' || d.barrio) as direccion,
-		          (p.costo_total + p.creditos_usados) as costo_total,
+		          p.costo_total,
       	      p.costo_envio,
-		          (p.costo_total + p.creditos_usados - p.costo_envio) as subtotal
+              p.creditos_usados
       FROM detalle_pedido dp
  	      JOIN pedido p ON p.id = dp.id_pedido
 	      JOIN datos_usuarios Du ON DU.id = p.id_usuario
@@ -399,7 +399,7 @@ async function getDetailsRestaurant(req, res) {
 		          (d.tipo_via || ' ' || d.numero_via || ' #' || d.numero_uno || ' - ' || d.numero_dos || ' ' || d.barrio) as direccion,
 		          p.costo_total,
       	      p.costo_envio,
-		          (p.costo_total - costo_envio) as subtotal
+		          p.creditos_usados,
       FROM detalle_pedido dp
  	      JOIN pedido p ON p.id = dp.id_pedido
 	      JOIN datos_usuarios Du ON DU.id = p.id_usuario
