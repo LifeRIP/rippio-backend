@@ -218,7 +218,7 @@ async function getDetail(req, res) {
 
   try {
 
-    const {id_details_order} = req.body;
+    const {id_details_order} = req.query;
   
     //Validar que los campos no estén vacíos
     if (!id_details_order) {
@@ -353,5 +353,41 @@ async function orderRestaurant(req, res) {
   }
 }
 
+async function getDatilsRestaurant(req, res) {
+  try {
+
+    const { id } = req.user;
+
+    response = await pool.query(
+      `SELECT dp.id_pedido,p.estado, p.fecha,
+              (Du.nombre || ' ' || Du.apellido) as cliente,
+              (d.tipo_via || ' ' || d.numero_via || ' #' || d.numero_uno || ' - ' || d.numero_dos || ' ' || d.barrio) as direccion,
+              p.costo_total,
+      	      p.costo_envio,
+              (p.costo_total - costo_envio) as subtotal
+      FROM detalle_pedido dp
+ 	      JOIN pedido p ON p.id = dp.id_pedido
+        JOIN datos_usuarios Du ON DU.id = p.id_usuario
+        JOIN direccion d ON d.id = p.id_direccion
+      WHERE p.id_restaurante = $1`,
+      [id]
+    );
+
+    if (response.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: 'No se encontraron pedidos para el restaurante' });
+    }
+
+    res.json(response.rows);
+  }
+    
+  catch (error) {
+    console.error(error.message);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los pedidos' });
+  }
+}
 
 module.exports = { add_order,getByUserID,getDetail,orderStatus,orderRestaurant };
