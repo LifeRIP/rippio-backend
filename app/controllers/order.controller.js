@@ -401,7 +401,7 @@ async function getDetailsRestaurant(req, res) {
               d.observaciones as observacion_direccion,
 		          p.costo_total,
       	      p.costo_envio,
-		          p.creditos_usados,
+		          p.creditos_usados
       FROM detalle_pedido dp
  	      JOIN pedido p ON p.id = dp.id_pedido
 	      JOIN datos_usuarios Du ON DU.id = p.id_usuario
