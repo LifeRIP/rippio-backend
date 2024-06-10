@@ -105,8 +105,6 @@ async function add_order(req, res) {
         return res.status(400).json({ error: 'No puedes usar créditos' });
       }
 
-      credits_used =
-
       total_cost = Number(total.rows[0].costo_total) - Number(credits.rows[0].creditos) + Number(shipping_cost);
 
       if (total_cost < 0) {
