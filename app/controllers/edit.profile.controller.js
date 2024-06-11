@@ -226,7 +226,7 @@ async function add_address(req, res) {
       !tipo_via ||
       !numero_via ||
       !numero_uno ||
-      !numero_dos
+      (numero_dos === undefined || numero_dos === null)
     ) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
@@ -305,8 +305,9 @@ async function modify_address(req, res) {
       !tipo_via ||
       !numero_via ||
       !numero_uno ||
-      !numero_dos
+      (numero_dos === undefined || numero_dos === null)
     ) {
+      console.log(req.body);
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
 
