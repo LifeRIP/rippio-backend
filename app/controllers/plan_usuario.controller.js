@@ -14,11 +14,27 @@ async function getById(req, res) {
       WHERE id_usuario = $1`,
       [id]
     );
-    res.status(200).json(response.rows);
+    res.status(200).json(response.rows[0]);
   } catch (error) {
     console.error(error); // Imprime el error en la consola
     res.status(500).json({ error: 'Ha ocurrido un error al obtener el plan' });
   }
+}
+
+
+async function cancelPlan(req, res) {
+  try {
+    const { id } = req.user;
+    const response = await pool.query(
+      `UPDATE plan_usuario SET estado = false WHERE id_usuario = $1 RETURNING *`,
+      [id]
+    );
+    res.status(200).json(response.rows[0]);
+  } catch (error) {
+    console.error(error); // Imprime el error en la consola
+    res.status(500).json({ error: 'Ha ocurrido un error al cancelar el plan' });
+  }
+
 }
 
 async function getPlan(req, res) {
@@ -55,7 +71,7 @@ async function getPlan(req, res) {
     // Si el usuario ya tiene un plan y está dentro de la fecha de vigencia se le notifica
     if (existe.rows.length > 0) {
       const plan = existe.rows[0];
-      if (plan.fecha_termino > fecha_hoy) {
+      if (plan.fecha_termino > fecha_hoy && existe.rows[0].estado === true) {
         return res.status(400).json({ error: 'Ya tienes un plan activo' });
       }}
 
@@ -68,12 +84,13 @@ async function getPlan(req, res) {
           res.json(response.rows[0]);
     }else{
     //si da false el if, se inserta un nuevo registro
-       await pool.query(
+       const insertResponse = await pool.query(
         `INSERT INTO plan_usuario (id_usuario, id_plan, estado, fecha_inicio, fecha_termino)
-        VALUES ($1, $2, $3, $4, $5) `,
+        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
         [id, id_plan, estado, fecha_hoy, fecha_fin]
-      );}
-      res.json({ message: 'Membresía elegida correctamente' });
+      );
+      res.json(insertResponse.rows[0]);
+    }
     
     }catch (error) {
         console.error(error); // Imprime el error en la consola
@@ -81,4 +98,4 @@ async function getPlan(req, res) {
     }
   }
 
-module.exports = { getPlan, getById };
+module.exports = { getPlan, getById, cancelPlan };
