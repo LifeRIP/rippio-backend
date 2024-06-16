@@ -39,6 +39,10 @@ async function getMostRequested(req, res) {
             UNION ALL
             SELECT 'Postres', '%postre%'
             UNION ALL
+            SELECT 'Postres', '%pastel%'
+            UNION ALL
+            SELECT 'Postres', '%malteada%'
+            UNION ALL
             SELECT 'Postres', '%helado%'
             UNION ALL
             SELECT 'Postres', '%cono%'
