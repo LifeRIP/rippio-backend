@@ -186,7 +186,7 @@ async function PageRestaurant(req, res) {
     //Validar categoria requerida
     if (!category && !rating) {
       response = await pool.query(
-        `SELECT r.img_banner, du.img_icon, du.nombre, r.calificacion
+        `SELECT DISTINCT r.img_banner, du.img_icon, du.nombre, r.calificacion
       FROM restaurante r JOIN direccion d ON r.id_direccion = d.id
 	        JOIN datos_usuarios du ON r.id = du.id
 	        JOIN categoria_res cr ON cr.id_restaurante = r.id 
@@ -197,7 +197,7 @@ async function PageRestaurant(req, res) {
       );
     } else if (category && !rating) {
       response = await pool.query(
-        `SELECT r.img_banner, du.img_icon, du.nombre, r.calificacion
+        `SELECT DISTINCT r.img_banner, du.img_icon, du.nombre, r.calificacion
         FROM restaurante r JOIN direccion d ON r.id_direccion = d.id
               JOIN datos_usuarios du ON r.id = du.id
               JOIN categoria_res cr ON cr.id_restaurante = r.id 
@@ -208,7 +208,7 @@ async function PageRestaurant(req, res) {
       );
     } else if (!category && rating) {
       response = await pool.query(
-        `SELECT r.img_banner, du.img_icon, du.nombre, r.calificacion
+        `SELECT DISTINCT r.img_banner, du.img_icon, du.nombre, r.calificacion
         FROM restaurante r JOIN direccion d ON r.id_direccion = d.id
               JOIN datos_usuarios du ON r.id = du.id
               JOIN categoria_res cr ON cr.id_restaurante = r.id 
@@ -219,7 +219,7 @@ async function PageRestaurant(req, res) {
       );
     } else {
       response = await pool.query(
-        `SELECT r.img_banner, du.img_icon, du.nombre, r.calificacion
+        `SELECT DISTINCT r.img_banner, du.img_icon, du.nombre, r.calificacion
         FROM restaurante r JOIN direccion d ON r.id_direccion = d.id
               JOIN datos_usuarios du ON r.id = du.id
               JOIN categoria_res cr ON cr.id_restaurante = r.id 
