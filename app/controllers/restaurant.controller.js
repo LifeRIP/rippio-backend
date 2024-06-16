@@ -110,7 +110,6 @@ async function getInfoById(req, res) {
       [id]
     );
 
-
     const rows = response.rows;
     const restaurant = {
       id: rows[0].id,
@@ -131,24 +130,23 @@ async function getInfoById(req, res) {
       });
     }
     const daysOfWeek = {
-      'Lunes': 1,
-      'Martes': 2,
-      'Miércoles': 3,
-      'Jueves': 4,
-      'Viernes': 5,
-      'Sábado': 6,
-      'Domingo': 7
+      Lunes: 1,
+      Martes: 2,
+      Miércoles: 3,
+      Jueves: 4,
+      Viernes: 5,
+      Sábado: 6,
+      Domingo: 7,
     };
 
     restaurant.horario.sort((a, b) => daysOfWeek[a.day] - daysOfWeek[b.day]);
-    
-    res.status(200).json(restaurant);
 
+    res.status(200).json(restaurant);
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json({ error: 'Ha ocurrido un error al obtener la información del restaurante' });
+    res.status(500).json({
+      error: 'Ha ocurrido un error al obtener la información del restaurante',
+    });
   }
 }
 
@@ -173,9 +171,77 @@ async function getByCategory(req, res) {
   }
 }
 
+async function PageRestaurant(req, res) {
+  try {
+    // Datos de filtrado
+    const city = req.query.ciudad;
+    const category = req.query.categoria;
+    const rating = req.query.calificacion;
+
+    //Validar ciudad requerida
+    if (!city) {
+      return res.status(400).json({ error: 'El campo ciudad es requerido' });
+    }
+
+    //Validar categoria requerida
+    if (!category && !rating) {
+      response = await pool.query(
+        `SELECT r.img_banner, du.img_icon, du.nombre, r.calificacion
+      FROM restaurante r JOIN direccion d ON r.id_direccion = d.id
+	        JOIN datos_usuarios du ON r.id = du.id
+	        JOIN categoria_res cr ON cr.id_restaurante = r.id 
+	        JOIN categoria c ON c.id = cr.id_categoria
+      WHERE d.ciudad = $1
+      ORDER BY r.calificacion desc`,
+        [city]
+      );
+    } else if (category && !rating) {
+      response = await pool.query(
+        `SELECT r.img_banner, du.img_icon, du.nombre, r.calificacion
+        FROM restaurante r JOIN direccion d ON r.id_direccion = d.id
+              JOIN datos_usuarios du ON r.id = du.id
+              JOIN categoria_res cr ON cr.id_restaurante = r.id 
+              JOIN categoria c ON c.id = cr.id_categoria
+        WHERE d.ciudad = $1 AND c.nombre = $2
+        ORDER BY r.calificacion desc`,
+        [city, category]
+      );
+    } else if (!category && rating) {
+      response = await pool.query(
+        `SELECT r.img_banner, du.img_icon, du.nombre, r.calificacion
+        FROM restaurante r JOIN direccion d ON r.id_direccion = d.id
+              JOIN datos_usuarios du ON r.id = du.id
+              JOIN categoria_res cr ON cr.id_restaurante = r.id 
+              JOIN categoria c ON c.id = cr.id_categoria
+        WHERE d.ciudad = $1 AND r.calificacion BETWEEN $2 AND $3
+        ORDER BY r.calificacion desc`,
+        [city, 0, rating]
+      );
+    } else {
+      response = await pool.query(
+        `SELECT r.img_banner, du.img_icon, du.nombre, r.calificacion
+        FROM restaurante r JOIN direccion d ON r.id_direccion = d.id
+              JOIN datos_usuarios du ON r.id = du.id
+              JOIN categoria_res cr ON cr.id_restaurante = r.id 
+              JOIN categoria c ON c.id = cr.id_categoria
+        WHERE d.ciudad = $1 AND c.nombre = $2 AND r.calificacion BETWEEN $3 AND $4
+        ORDER BY r.calificacion desc`,
+        [city, category, 0, rating]
+      );
+    }
+    res.status(200).json(response.rows);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los restaurantes' });
+  }
+}
+
 module.exports = {
   getTopByCity,
   getCatAndProdByResId,
   getInfoById,
   getByCategory,
+  PageRestaurant,
 };
