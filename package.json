@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "cp -r app/services/mail/templates . && vercel build",
     "dev": "nodemon --ext js,mjs,cjs,json --exec node --env-file=.env.local index.js",
     "prod": "nodemon --ext js,mjs,cjs,json --exec node --env-file=.env.production index.js"
   },
