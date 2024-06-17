@@ -23,12 +23,9 @@ function sendEmail(email, subject, payload, template) {
     },
   });
 
-  console.log(path.join(path.resolve(), '/app/services/mail', template));
+  console.log(path.join(__dirname, template));
   // Plantilla de correo
-  const source = fs.readFileSync(
-    path.join(path.resolve(), '/app/services/mail', template),
-    'utf8'
-  );
+  const source = fs.readFileSync(path.join(__dirname, template), 'utf8');
   const compiledTemplate = handlebars.compile(source);
 
   const mailOptions = {
