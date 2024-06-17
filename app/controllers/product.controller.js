@@ -127,7 +127,6 @@ async function add(req, res) {
       // Recursion para agregar el producto a varias secciones
 
       for (let i = 0; i < secciones.length; i++) {
-        
         //Agregar el producto a una seccion
         await pool.query(
           `INSERT INTO seccion_prod (id_producto, id_seccion)
@@ -144,16 +143,15 @@ async function add(req, res) {
     } else if (valtipo_usuario === 3) {
       //si es usuario no es admin, verifica si es el propio restaurante
 
-      const { 
+      const {
         disponible,
         nombre,
         descripcion,
         cost_unit,
         img_product,
-        secciones 
+        secciones,
       } = req.body;
 
-      
       // Validar que los campos no estén vacíos
       // Add missing variable declaration for 'response'
 
@@ -167,17 +165,15 @@ async function add(req, res) {
       ) {
         return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
-      console.log(secciones)
+      console.log(secciones);
       // Agregar el producto
       response = await pool.query(
         `INSERT INTO producto (id_restaurante, disponible, nombre, descripcion, cost_unit, img_product,estado)
             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
         [id, disponible, nombre, descripcion, cost_unit, img_product, true]
       );
-      console.log("hola")
       // Recursion para agregar el producto a varias secciones
       for (let i = 0; i < secciones.length; i++) {
-
         //Agregar el producto a una seccion
         await pool.query(
           `INSERT INTO seccion_prod (id_producto, id_seccion)
@@ -220,18 +216,10 @@ async function updateState(req, res) {
     //comprueba si el usuario es un admin
 
     if (valtipo_usuario === 2) {
-      const {
-        id_restaurante,
-        nombre_prod,
-        disponible,
-      } = req.body;
+      const { id_restaurante, nombre_prod, disponible } = req.body;
 
       // Validar que los campos no estén vacíos
-      if (
-        !id_restaurante ||
-        !nombre_prod ||
-        !disponible
-      ) {
+      if (!id_restaurante || !nombre_prod || !disponible) {
         return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
 
@@ -264,16 +252,10 @@ async function updateState(req, res) {
         });
       }
     } else if (valtipo_usuario === 3) {
-      const {
-        nombre_prod,
-        disponible 
-      } = req.body;
+      const { nombre_prod, disponible } = req.body;
 
       // Validar que los campos no estén vacíos
-      if (
-        !nombre_prod ||
-        !disponible
-      ) {
+      if (!nombre_prod || !disponible) {
         return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
 
@@ -337,18 +319,10 @@ async function updateSeccionProd(req, res) {
     //comprueba si el usuario es un admin
 
     if (valtipo_usuario === 2) {
-      const {
-        id_restaurante,
-        id_producto,
-        secciones,
-      } = req.body;
+      const { id_restaurante, id_producto, secciones } = req.body;
 
       // Validar que los campos no estén vacíos
-      if (
-        !id_restaurante ||
-        !id_producto ||
-        !secciones
-      ) {
+      if (!id_restaurante || !id_producto || !secciones) {
         return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
 
@@ -364,14 +338,12 @@ async function updateSeccionProd(req, res) {
       }
 
       // Eliminar las secciones anteriores
-      await pool.query(
-        `DELETE FROM seccion_prod WHERE id_producto = $1`,
-        [producto.rows[0].id]
-      );
+      await pool.query(`DELETE FROM seccion_prod WHERE id_producto = $1`, [
+        producto.rows[0].id,
+      ]);
 
       // Recursion para agregar el producto a varias secciones
       for (let i = 0; i < secciones.length; i++) {
-
         //Agregar el producto a una seccion
         await pool.query(
           `INSERT INTO seccion_prod (id_producto, id_seccion)
@@ -385,19 +357,13 @@ async function updateSeccionProd(req, res) {
         message: 'Seccion actualizada correctamente',
       });
     } else if (valtipo_usuario === 3) {
-      const {
-        id_producto,
-        secciones 
-      } = req.body;
+      const { id_producto, secciones } = req.body;
 
       // Validar que los campos no estén vacíos
-      if (
-        !id_producto ||
-        !secciones
-      ) {
+      if (!id_producto || !secciones) {
         return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
-      console.log(secciones)
+      console.log(secciones);
       // Verificar si el producto existe
 
       producto = await pool.query(
@@ -411,32 +377,31 @@ async function updateSeccionProd(req, res) {
 
       // Eliminar las secciones anteriores
 
-      await pool.query(
-        `DELETE FROM seccion_prod WHERE id_producto = $1`,
-        [producto.rows[0].id]
-      );
+      await pool.query(`DELETE FROM seccion_prod WHERE id_producto = $1`, [
+        producto.rows[0].id,
+      ]);
 
       // Recursion para agregar el producto a varias secciones
 
       for (let i = 0; i < secciones.length; i++) {
-          
-          //Agregar el producto a una seccion
-          await pool.query(
-            `INSERT INTO seccion_prod (id_producto, id_seccion)
+        //Agregar el producto a una seccion
+        await pool.query(
+          `INSERT INTO seccion_prod (id_producto, id_seccion)
               VALUES ($1, $2) RETURNING *`,
-            [producto.rows[0].id, secciones[i]]
-          );
-        }
+          [producto.rows[0].id, secciones[i]]
+        );
+      }
 
       // Responder al cliente
       res.json({
         message: 'Seccion actualizada correctamente',
       });
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Ha ocurrido un error al actualizar la seccion' });
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al actualizar la seccion' });
   }
 }
 
@@ -499,18 +464,24 @@ async function updateProd(req, res) {
       // Actualizar el producto
       response = await pool.query(
         `UPDATE producto SET disponible = $1, nombre = $2, descripcion = $3, cost_unit = $4, img_product = $5 WHERE id_restaurante = $6 AND id = $7 RETURNING *`,
-        [disponible, nombre, descripcion, cost_unit, img_product, id_restaurante, id_producto]
+        [
+          disponible,
+          nombre,
+          descripcion,
+          cost_unit,
+          img_product,
+          id_restaurante,
+          id_producto,
+        ]
       );
 
       // Eliminar las secciones anteriores
-      await pool.query(
-        `DELETE FROM seccion_prod WHERE id_producto = $1`,
-        [producto.rows[0].id]
-      );
+      await pool.query(`DELETE FROM seccion_prod WHERE id_producto = $1`, [
+        producto.rows[0].id,
+      ]);
 
       // Recursion para agregar el producto a varias secciones
       for (let i = 0; i < secciones.length; i++) {
-
         //Agregar el producto a una seccion
         await pool.query(
           `INSERT INTO seccion_prod (id_producto, id_seccion)
@@ -524,9 +495,7 @@ async function updateProd(req, res) {
         message: 'Producto actualizado correctamente',
         response: response.rows[0],
       });
-    }
-    
-    else if (valtipo_usuario === 3) {
+    } else if (valtipo_usuario === 3) {
       const {
         id_producto,
         disponible,
@@ -551,7 +520,7 @@ async function updateProd(req, res) {
       }
 
       // Verificar si el producto existe
-      console.log(secciones)
+      console.log(secciones);
       producto = await pool.query(
         'SELECT * FROM producto WHERE id_restaurante = $1 AND id = $2',
         [id, id_producto]
@@ -560,22 +529,28 @@ async function updateProd(req, res) {
       if (producto.rowCount === 0) {
         return res.status(400).json({ error: 'El producto no existe' });
       }
-      
+
       // Actualizar el producto
       response = await pool.query(
         `UPDATE producto SET disponible = $1, nombre = $2, descripcion = $3, cost_unit = $4, img_product = $5 WHERE id_restaurante = $6 AND id = $7 RETURNING *`,
-        [disponible, nombre, descripcion, cost_unit, img_product, id, id_producto]
+        [
+          disponible,
+          nombre,
+          descripcion,
+          cost_unit,
+          img_product,
+          id,
+          id_producto,
+        ]
       );
 
       // Eliminar las secciones anteriores
-      await pool.query(
-        `DELETE FROM seccion_prod WHERE id_producto = $1`,
-        [producto.rows[0].id]
-      );
+      await pool.query(`DELETE FROM seccion_prod WHERE id_producto = $1`, [
+        producto.rows[0].id,
+      ]);
 
       // Recursion para agregar el producto a varias secciones
       for (let i = 0; i < secciones.length; i++) {
-
         //Agregar el producto a una seccion
         await pool.query(
           `INSERT INTO seccion_prod (id_producto, id_seccion)
@@ -590,10 +565,11 @@ async function updateProd(req, res) {
         response: response.rows[0],
       });
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Ha ocurrido un error al actualizar el producto' });
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al actualizar el producto' });
   }
 }
 
@@ -616,16 +592,10 @@ async function deleteProd(req, res) {
     //comprueba si el usuario es un admin
 
     if (valtipo_usuario === 2) {
-      const {
-        id_restaurante,
-        id_producto,
-      } = req.body;
+      const { id_restaurante, id_producto } = req.body;
 
       // Validar que los campos no estén vacíos
-      if (
-        !id_restaurante ||
-        !id_producto
-      ) {
+      if (!id_restaurante || !id_producto) {
         return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
 
@@ -651,14 +621,10 @@ async function deleteProd(req, res) {
         message: 'Producto eliminado correctamente',
       });
     } else if (valtipo_usuario === 3) {
-      const {
-        id_producto,
-      } = req.body;
+      const { id_producto } = req.body;
 
       // Validar que los campos no estén vacíos
-      if (
-        !id_producto
-      ) {
+      if (!id_producto) {
         return res.status(400).json({ error: 'Faltan campos por llenar' });
       }
 
@@ -684,11 +650,20 @@ async function deleteProd(req, res) {
         message: 'Producto eliminado correctamente',
       });
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Ha ocurrido un error al eliminar el producto' });
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al eliminar el producto' });
   }
 }
 
-module.exports = { getByResID, getByResProd, add, updateState, updateSeccionProd, updateProd, deleteProd};
+module.exports = {
+  getByResID,
+  getByResProd,
+  add,
+  updateState,
+  updateSeccionProd,
+  updateProd,
+  deleteProd,
+};

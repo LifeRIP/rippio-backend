@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 const { now, min } = require('moment');
 const {
   generateResetToken,
-  sendResetEmail,
-} = require('../services/mailService');
+  sendEmail,
+} = require('../services/mail/mailService');
+const clientURL = process.env.CLIENT_URL;
 
 async function forgotPassword(req, res) {
   try {
@@ -30,11 +31,12 @@ async function forgotPassword(req, res) {
     // Genera un token de recuperación
     const resetToken = generateResetToken();
 
-    // separar la fecha en dia, mes y año hora, minuto, segundo para sumarle 15 minutos
+    // Separar la fecha en dia, mes y año hora, minuto, segundo para sumarle 15 minutos
     const tokenExpiration = new Date(fecha);
     tokenExpiration.setMinutes(tokenExpiration.getMinutes() + 15);
 
     const id = user.rows[0].id;
+    const link = `${clientURL}/reset-password?token=${resetToken}`;
 
     const tokenExist = await pool.query(
       'SELECT id FROM restablecer_pass WHERE id = $1',
@@ -46,7 +48,17 @@ async function forgotPassword(req, res) {
         'INSERT INTO restablecer_pass (id, token, expira) VALUES ($1, $2, $3)',
         [id, resetToken, tokenExpiration]
       );
-      sendResetEmail(email, resetToken); // Enviar correo con el token
+      console.log(email, user.rows[0].nombre, link);
+      // Envia el correo con el link de restablecimiento
+      sendEmail(
+        email,
+        'Restablecer tu contraseña',
+        {
+          name: user.rows[0].nombre,
+          link: link,
+        },
+        '/templates/resetPassword.handlebars'
+      );
       return res.json({
         message:
           'Se ha enviado un correo con instrucciones para restablecer tu contraseña',
@@ -58,13 +70,24 @@ async function forgotPassword(req, res) {
       );
     }
 
-    sendResetEmail(email, resetToken); // Enviar correo con el token
+    console.log(email, user.rows[0].nombre, link);
+    // Envia el correo con el link de restablecimiento
+    sendEmail(
+      email,
+      'Restablecer tu contraseña',
+      {
+        name: user.rows[0].nombre,
+        link: link,
+      },
+      '/templates/resetPassword.handlebars'
+    );
 
     res.json({
       message:
         'Se ha enviado un correo con instrucciones para restablecer tu contraseña',
     });
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ message: 'Ha ocurrido un error al restablecer la contraseña' });
@@ -73,8 +96,7 @@ async function forgotPassword(req, res) {
 
 async function resetPassword(req, res) {
   try {
-    const { token } = req.query;
-    const { newPassword, confirmNewPassword, time } = req.body;
+    const { token, newPassword, confirmNewPassword, time } = req.body;
 
     // Verifica si la nueva contraseña no está vacía
     if (!token || !newPassword || !time || !confirmNewPassword) {
