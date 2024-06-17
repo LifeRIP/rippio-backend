@@ -51,7 +51,7 @@ async function forgotPassword(req, res) {
       );
       console.log(email, name, link);
       // Envia el correo con el link de restablecimiento
-      sendEmail(email, 'Restablecer tu contraseña', name, link);
+      await sendEmail(email, 'Restablecer tu contraseña', name, link);
       return res.json({
         message:
           'Se ha enviado un correo con instrucciones para restablecer tu contraseña',
@@ -65,7 +65,7 @@ async function forgotPassword(req, res) {
 
     console.log(email, name, link);
     // Envia el correo con el link de restablecimiento
-    sendEmail(email, 'Restablecer tu contraseña', name, link);
+    await sendEmail(email, 'Restablecer tu contraseña', name, link);
 
     res.json({
       message:
