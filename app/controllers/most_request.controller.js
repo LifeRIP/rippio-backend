@@ -13,59 +13,59 @@ async function getMostRequested(req, res) {
 
     const response = await pool.query(
       `WITH categories AS (
-            SELECT 'Hamburguesas' AS category, '%hamburguesa%' AS keyword
+            SELECT 'Hamburguesa' AS category, '%hamburguesa%' AS keyword
             UNION ALL
-            SELECT 'Pizzas', '%pizza%'
+            SELECT 'Pizza', '%pizza%'
             UNION ALL
             SELECT 'Sushi', '%sushi%'
             UNION ALL
-            SELECT 'Salchipapas', '%salchipapa%'
+            SELECT 'Salchipapa', '%salchipapa%'
             UNION ALL
-            SELECT 'Pastas', '%pasta%'
+            SELECT 'Pasta', '%pasta%'
             UNION ALL
-            SELECT 'Pastas', '%fideos%'
+            SELECT 'Pasta', '%fideos%'
             UNION ALL
-            SELECT 'Pastas', '%spaghetti%'
+            SELECT 'Pasta', '%spaghetti%'
             UNION ALL
-            SELECT 'Ensaladas', '%ensalada%'
+            SELECT 'Ensalada', '%ensalada%'
             UNION ALL
-            SELECT 'Ensaladas', '%verdura%'
+            SELECT 'Ensalada', '%verdura%'
             UNION ALL
-            SELECT 'Asados', '%asado%'
+            SELECT 'Asado', '%asado%'
             UNION ALL
             SELECT 'Comida China', '%china%'
             UNION ALL
             SELECT 'Comida China', '%arroz%'
             UNION ALL
-            SELECT 'Postres', '%postre%'
+            SELECT 'Postre', '%postre%'
             UNION ALL
-            SELECT 'Postres', '%pastel%'
+            SELECT 'Postre', '%pastel%'
             UNION ALL
-            SELECT 'Postres', '%malteada%'
+            SELECT 'Postre', '%malteada%'
             UNION ALL
-            SELECT 'Postres', '%helado%'
+            SELECT 'Postre', '%helado%'
             UNION ALL
-            SELECT 'Postres', '%cono%'
+            SELECT 'Postre', '%cono%'
             UNION ALL
-            SELECT 'Postres', '%brownie%'
+            SELECT 'Postre', '%brownie%'
             UNION ALL
-            SELECT 'Postres', '%McFlurry%'
+            SELECT 'Postre', '%McFlurry%'
             UNION ALL
-            SELECT 'Bebidas', '%bebida%'
+            SELECT 'Bebida', '%bebida%'
             UNION ALL
-            SELECT 'Bebidas', '%gaseosa%'
+            SELECT 'Bebida', '%gaseosa%'
             UNION ALL
-            SELECT 'Bebidas', '%refresc%'
+            SELECT 'Bebida', '%refresc%'
             UNION ALL
-            SELECT 'Bebidas', '%botella%'
+            SELECT 'Bebida', '%botella%'
             UNION ALL
-            SELECT 'Bebidas', '%jugo%'
+            SELECT 'Bebida', '%jugo%'
             UNION ALL
-            SELECT 'Bebidas', '%agua%'
+            SELECT 'Bebida', '%agua%'
             UNION ALL
-            SELECT 'Bebidas', '%te%'
+            SELECT 'Bebida', '%te%'
             UNION ALL
-            SELECT 'Combos', '%combo%'
+            SELECT 'Combo', '%combo%'
         )
         SELECT c.category
         FROM PEDIDO p JOIN DETALLE_PEDIDO dp ON p.id = dp.id_pedido
