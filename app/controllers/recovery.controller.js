@@ -73,11 +73,17 @@ async function forgotPassword(req, res) {
 
 async function resetPassword(req, res) {
   try {
-    const { token, newPassword, time } = req.body;
+    const { token } = req.query;
+    const { newPassword, confirmNewPassword, time } = req.body;
 
     // Verifica si la nueva contraseña no está vacía
-    if (!token || !newPassword || !time) {
+    if (!token || !newPassword || !time || !confirmNewPassword) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
+    }
+
+    // Verifica si las contraseñas coinciden
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).json({ message: 'Las contraseñas no coinciden' });
     }
 
     // Verifica si el token es válido y no ha expirado
@@ -87,7 +93,7 @@ async function resetPassword(req, res) {
     );
 
     if (user.rows.length === 0) {
-      return res.status(400).json({ message: 'Token inválido o expirado' });
+      return res.status(400).json({ message: 'Link expirado' });
     }
 
     // Hashea la nueva contraseña
