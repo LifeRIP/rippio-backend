@@ -35,6 +35,7 @@ async function forgotPassword(req, res) {
     const tokenExpiration = new Date(fecha);
     tokenExpiration.setMinutes(tokenExpiration.getMinutes() + 15);
 
+    const name = user.rows[0].nombre;
     const id = user.rows[0].id;
     const link = `${clientURL}/reset-password?token=${resetToken}`;
 
@@ -48,17 +49,9 @@ async function forgotPassword(req, res) {
         'INSERT INTO restablecer_pass (id, token, expira) VALUES ($1, $2, $3)',
         [id, resetToken, tokenExpiration]
       );
-      console.log(email, user.rows[0].nombre, link);
+      console.log(email, name, link);
       // Envia el correo con el link de restablecimiento
-      sendEmail(
-        email,
-        'Restablecer tu contraseña',
-        {
-          name: user.rows[0].nombre,
-          link: link,
-        },
-        '/templates/resetPassword.handlebars'
-      );
+      sendEmail(email, 'Restablecer tu contraseña', name, link);
       return res.json({
         message:
           'Se ha enviado un correo con instrucciones para restablecer tu contraseña',
@@ -70,17 +63,9 @@ async function forgotPassword(req, res) {
       );
     }
 
-    console.log(email, user.rows[0].nombre, link);
+    console.log(email, name, link);
     // Envia el correo con el link de restablecimiento
-    sendEmail(
-      email,
-      'Restablecer tu contraseña',
-      {
-        name: user.rows[0].nombre,
-        link: link,
-      },
-      '/templates/resetPassword.handlebars'
-    );
+    sendEmail(email, 'Restablecer tu contraseña', name, link);
 
     res.json({
       message:

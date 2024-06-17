@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+function resetPassword(name, link) {
+  return `<!DOCTYPE html>
 <html>
 
 <head>
@@ -204,12 +205,12 @@
               </div>
               <div class="content">
                 <h1>Restablecer tu contraseña</h1>
-                <p>Hola {{name}},</p>
+                <p>Hola ${name},</p>
                 <p>Hemos recibido una solicitud para restablecer tu contraseña. Haz clic en el botón de abajo para
                   continuar
                   con
                   el proceso:</p>
-                <a href="{{link}}" class="button">Restablecer contraseña</a>
+                <a href="${link}" class="button">Restablecer contraseña</a>
                 <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
                 <p>Gracias,<br>El equipo de Rippio</p>
               </div>
@@ -225,4 +226,7 @@
   </table>
 </body>
 
-</html>
+</html>`;
+}
+
+module.exports = resetPassword;

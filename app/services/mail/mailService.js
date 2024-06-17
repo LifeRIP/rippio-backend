@@ -1,15 +1,13 @@
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const handlebars = require('handlebars');
-const fs = require('fs');
-const path = require('path');
+const resetPassword = require('./templates/resetPassword');
 
 // Funcion para generar un token de recuperacion
 function generateResetToken() {
   return crypto.randomBytes(20).toString('hex');
 }
 
-function sendEmail(email, subject, payload, template) {
+function sendEmail(email, subject, name, link) {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: 465,
@@ -23,16 +21,11 @@ function sendEmail(email, subject, payload, template) {
     },
   });
 
-  console.log(path.join(__dirname, template));
-  // Plantilla de correo
-  const source = fs.readFileSync(path.join(__dirname, template), 'utf8');
-  const compiledTemplate = handlebars.compile(source);
-
   const mailOptions = {
     from: `Rippio <${process.env.EMAIL_USER}>`,
     to: email,
     subject: subject,
-    html: compiledTemplate(payload),
+    html: resetPassword(name, link),
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
