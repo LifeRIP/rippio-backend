@@ -1,14 +1,19 @@
-const {
-  generateResetToken,
-  getExpirationTime,
-  sendResetEmail,
-} = require('../services/mailService');
 const { pool } = require('../database/dbConfig');
 const bcrypt = require('bcrypt');
+const { now, min } = require('moment');
+const {
+  generateResetToken,
+  sendResetEmail,
+} = require('../services/mailService');
 
 async function forgotPassword(req, res) {
   try {
-    const { email } = req.body;
+    const { email, fecha } = req.body;
+
+    // Verifica que los campos no estén vacíos
+    if (!email || !fecha) {
+      return res.status(400).json({ message: 'Faltan campos por llenar' });
+    }
 
     // Verifica si el correo existe en la base de datos
     const user = await pool.query(
@@ -22,16 +27,19 @@ async function forgotPassword(req, res) {
         .json({ message: 'Correo electrónico no registrado' });
     }
 
-    // Genera un token de recuperación y una marca de tiempo de expiración
+    // Genera un token de recuperación
     const resetToken = generateResetToken();
-    const tokenExpiration = getExpirationTime();
+
+    // separar la fecha en dia, mes y año hora, minuto, segundo para sumarle 15 minutos
+    const tokenExpiration = new Date(fecha);
+    tokenExpiration.setMinutes(tokenExpiration.getMinutes() + 15);
+
     const id = user.rows[0].id;
 
     const tokenExist = await pool.query(
       'SELECT id FROM restablecer_pass WHERE id = $1',
       [id]
     );
-
     // Si no existe un token en la base de datos, lo crea
     if (tokenExist.rows.length === 0) {
       await pool.query(
@@ -43,13 +51,13 @@ async function forgotPassword(req, res) {
         message:
           'Se ha enviado un correo con instrucciones para restablecer tu contraseña',
       });
+    } else {
+      await pool.query(
+        'UPDATE restablecer_pass SET token = $1, expira = $2 WHERE id = $3',
+        [resetToken, tokenExpiration, id]
+      );
     }
 
-    // Si ya existe un token en la base de datos, lo actualiza
-    await pool.query(
-      'UPDATE restablecer_pass SET token = $1, expira = $2 WHERE id = $3',
-      [resetToken, tokenExpiration, id]
-    );
     sendResetEmail(email, resetToken); // Enviar correo con el token
 
     res.json({
@@ -65,17 +73,17 @@ async function forgotPassword(req, res) {
 
 async function resetPassword(req, res) {
   try {
-    const { token, newPassword } = req.body;
+    const { token, newPassword, time } = req.body;
 
     // Verifica si la nueva contraseña no está vacía
-    if (!token || !newPassword) {
+    if (!token || !newPassword || !time) {
       return res.status(400).json({ message: 'Faltan campos por llenar' });
     }
 
     // Verifica si el token es válido y no ha expirado
     const user = await pool.query(
       'SELECT * FROM restablecer_pass WHERE token = $1 AND expira > $2',
-      [token, new Date()]
+      [token, time]
     );
 
     if (user.rows.length === 0) {
