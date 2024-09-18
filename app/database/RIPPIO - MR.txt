@@ -36,8 +36,8 @@ HORARIO (id-pk, id_restaurante, dia_semana, hora_apertura, hora_cierre)
 	id_restaurante -> RESTAURANTE.id					cascada
 
 MENSAJE (id-pk, id_conversacion, tipo_conversacion, usuario_enviando, mensaje, fecha)
-	id_pedido -> PEDIDO.id								cascada
-	id_pedido -> PEDIDO.id								cascada
+	id_conversacion -> CONVERSACION_PEDIDO.id								cascada
+	id_conversacion -> CONVERSACION_GENERAL.id								cascada
 		
 CONVERSACION_PEDIDO (id-pk, id_pedido, id_restaurante, id_usuario)
    id_pedido -> PEDIDO.id             					cascada
