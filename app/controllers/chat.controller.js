@@ -76,7 +76,7 @@ async function createchat_order(req, res) {
 
 async function getchat_order(req, res) {
   try {
-    const { id_pedido } = req.body;
+    const { id_pedido } = req.query;
     const { id } = req.user;
 
     // Comprobar los datos
