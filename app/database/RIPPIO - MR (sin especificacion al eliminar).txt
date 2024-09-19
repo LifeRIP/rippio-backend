@@ -35,17 +35,20 @@ DIRECCION_USUARIO (id-pk, id_usuario, id_direccion)
 HORARIO (id-pk, id_restaurante, dia_semana, hora_apertura, hora_cierre)
 	id_restaurante -> RESTAURANTE.id
 
-MENSAJE (id-pk, id_conversacion, tipo_conversacion, id_usuario, mensaje, fecha)
+MENSAJE_PEDIDO (id-pk, id_conversacion, id_usuario, mensaje, fecha)
 	id_conversacion -> CONVERSACION_PEDIDO.id								
-	id_conversacion -> CONVERSACION_GENERAL.id	
-	id_usuario -> DATOS_USUARIOS.id							
+	id_usuario -> DATOS_USUARIOS.id	
+
+MENSAJE_ADMIN (id-pk, id_conversacion, id_usuario, mensaje, fecha)							
+id_conversacion -> CONVERSACION_ADMIN.id	
+id_usuario -> DATOS_USUARIOS.id							
 		
 CONVERSACION_PEDIDO (id-pk, id_pedido, id_restaurante, id_usuario)
    id_pedido -> PEDIDO.id             					
    id_restaurante -> RESTAURANTE.id          			
    id_usuario -> DATOS_USUARIOS.id           			
 
-CONVERSACION_GENERAL (id-pk, id_admin, id_cliente)
+CONVERSACION_ADMIN (id-pk, id_admin, id_cliente)
    id_admin -> ADMINISTRADOR.id              			
    id_cliente -> DATOS_USUARIOS.id						
 		

@@ -35,9 +35,12 @@ DIRECCION_USUARIO (id-pk, id_usuario, id_direccion)
 HORARIO (id-pk, id_restaurante, dia_semana, hora_apertura, hora_cierre)
 	id_restaurante -> RESTAURANTE.id					cascada
 
-MENSAJE (id-pk, id_conversacion, tipo_conversacion, id_usuario, mensaje, fecha)
+MENSAJE_PEDIDO (id-pk, id_conversacion, id_usuario, mensaje, fecha)
 	id_conversacion -> CONVERSACION_PEDIDO.id								cascada
-	id_conversacion -> CONVERSACION_GENERAL.id								cascada
+	id_usuario -> DATOS_USUARIOS.id											cascada
+
+MENSAJE_ADMIN (id-pk, id_conversacion, id_usuario, mensaje, fecha)
+	id_conversacion -> CONVERSACION_ADMIN.id								cascada
 	id_usuario -> DATOS_USUARIOS.id											cascada
 		
 CONVERSACION_PEDIDO (id-pk, id_pedido, id_restaurante, id_usuario)
@@ -45,7 +48,7 @@ CONVERSACION_PEDIDO (id-pk, id_pedido, id_restaurante, id_usuario)
    id_restaurante -> RESTAURANTE.id          			null
    id_usuario -> DATOS_USUARIOS.id           			null
 
-CONVERSACION_GENERAL (id-pk, id_admin, id_cliente)
+CONVERSACION_ADMIN (id-pk, id_admin, id_cliente)
    id_admin -> ADMINISTRADOR.id              			null
    id_cliente -> DATOS_USUARIOS.id						null
 
