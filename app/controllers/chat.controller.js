@@ -105,6 +105,7 @@ async function getchat_order(req, res) {
           WHERE id_conversacion = (SELECT id
 					  FROM conversacion_pedido
 						WHERE id_pedido = $1)
+          ORDER BY m.fecha ASC
             `,
       [id_pedido]
     );
