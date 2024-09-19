@@ -99,11 +99,12 @@ async function getchat_order(req, res) {
 
     const response = await pool.query(
       `
-            SELECT *
-            FROM mensaje_pedido
-            WHERE id_conversacion = (SELECT id
-                                      FROM conversacion_pedido
-                                      WHERE id_pedido = $1)
+          SELECT m.id, m.id_conversacion, m.id_usuario, m.mensaje, m.fecha, d.img_icon, d.tipo_usuario
+          FROM mensaje_pedido m
+          JOIN datos_usuarios d on m.id_usuario = d.id
+          WHERE id_conversacion = (SELECT id
+					  FROM conversacion_pedido
+						WHERE id_pedido = $1)
             `,
       [id_pedido]
     );
