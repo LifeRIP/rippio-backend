@@ -170,8 +170,12 @@ async function add_order(req, res) {
       credits_result,
       id,
     ]);
+    // Devolver mensaje de éxito y el id del pedido
 
-    res.json({ message: 'Pedido creado correctamente' });
+    res.json({
+      message: 'Pedido creado correctamente',
+      id: newOrder.rows[0].id,
+    });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: 'Ha ocurrido un error al crear el pedido' });
@@ -261,11 +265,9 @@ async function getDetail(req, res) {
     res.json(response.rows);
   } catch (error) {
     console.error(error.message);
-    res
-      .status(500)
-      .json({
-        error: 'Ha ocurrido un error al obtener los detalles del pedido',
-      });
+    res.status(500).json({
+      error: 'Ha ocurrido un error al obtener los detalles del pedido',
+    });
   }
 }
 
@@ -296,12 +298,10 @@ async function orderStatus(req, res) {
       status !== 'Entregado' &&
       status !== 'Cancelado'
     ) {
-      return res
-        .status(400)
-        .json({
-          error:
-            'El campo status debe ser Pendiente, Preparando, En camino, Entregado o Entregado',
-        });
+      return res.status(400).json({
+        error:
+          'El campo status debe ser Pendiente, Preparando, En camino, Entregado o Entregado',
+      });
     }
 
     // Verificar si el pedido pertenece al restaurante
@@ -325,11 +325,9 @@ async function orderStatus(req, res) {
     res.json({ message: 'Estado del pedido actualizado correctamente' });
   } catch (error) {
     console.error(error.message);
-    res
-      .status(500)
-      .json({
-        error: 'Ha ocurrido un error al actualizar el estado del pedido',
-      });
+    res.status(500).json({
+      error: 'Ha ocurrido un error al actualizar el estado del pedido',
+    });
   }
 }
 
