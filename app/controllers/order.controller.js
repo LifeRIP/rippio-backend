@@ -189,6 +189,7 @@ async function getByUserID(req, res) {
       `SELECT
       p.id,
       r.nombre,
+      r.img_icon,
       p.costo_total,
       p.costo_envio,
       p.creditos_usados,
@@ -206,7 +207,7 @@ async function getByUserID(req, res) {
       JOIN detalle_pedido dp ON p.id = dp.id_pedido
       JOIN producto prod ON dp.id_producto = prod.id
       WHERE p.id_usuario = $1
-      GROUP BY p.id, r.nombre, p.costo_total, p.estado, p.fecha
+      GROUP BY p.id, r.nombre, r.img_icon, p.costo_total, p.estado, p.fecha
       ORDER BY p.fecha DESC
       LIMIT 10`,
       [id]
