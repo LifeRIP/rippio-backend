@@ -143,11 +143,17 @@ async function insertchat_order(req, res) {
     // Insertar mensaje
     const response = await pool.query(
       `
-            INSERT INTO mensaje_pedido (id_conversacion, id_usuario, mensaje, fecha)
-            VALUES ((SELECT id
-                    FROM conversacion_pedido
-                    WHERE id_pedido = $1), $2, $3, $4)
-            RETURNING *
+        WITH mensaje_insertado  AS (
+          INSERT INTO mensaje_pedido (id_conversacion, id_usuario, mensaje, fecha)
+          VALUES (
+          (SELECT id FROM conversacion_pedido WHERE id_pedido = $1),
+          $2, $3, $4
+          )
+          RETURNING *
+          )
+        SELECT mi.*, du.tipo_usuario, du.img_icon
+        FROM mensaje_insertado mi
+        JOIN datos_usuarios du ON mi.id_usuario = du.id;
             `,
       [id_pedido, id, mensaje, fecha]
     );
