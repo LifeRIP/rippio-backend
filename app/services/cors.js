@@ -5,6 +5,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       'http://localhost:5173',
       'http://localhost:5174',
       'https://rippio.netlify.app',
+      'https://rippio-prev-product.netlify.app',
     ];
 
 const corsOptions = {

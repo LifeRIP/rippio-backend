@@ -341,6 +341,7 @@ async function orderRestaurant(req, res) {
 		          (Du.nombre || ' ' || Du.apellido) as cliente,
 		          (d.tipo_via || ' ' || d.numero_via || ' #' || d.numero_uno || ' - ' || d.numero_dos || ' ' || d.barrio ) as direccion,
               d.observaciones as observacion_direccion,
+              du.img_icon,
 		          p.costo_total,
       	      p.costo_envio,
               p.creditos_usados
