@@ -8,9 +8,9 @@ async function getTopByCity(req, res) {
       FROM restaurante r
       JOIN direccion d ON r.id_direccion = d.id
       JOIN datos_usuarios du ON du.id = r.id
-      WHERE d.ciudad = '${[ciudad]}'
+      WHERE d.ciudad = $1 AND du.estado = true
       ORDER BY r.calificacion DESC
-      LIMIT 20`
+      LIMIT 20`, [ciudad]
     );
     res.json(response.rows);
   } catch (error) {
@@ -32,7 +32,7 @@ async function getCatAndProdByResId(req, res) {
       FROM seccion s
       LEFT JOIN seccion_prod sp ON s.id = sp.id_seccion
       LEFT JOIN producto p ON p.id = sp.id_producto
-      WHERE s.id_restaurante=$1
+      WHERE s.id_restaurante=$1 AND p.disponible = true
       AND (p.estado IS NULL OR p.estado=true)`,
       [id]
     );
@@ -191,7 +191,7 @@ async function PageRestaurant(req, res) {
 	        JOIN datos_usuarios du ON r.id = du.id
 	        JOIN categoria_res cr ON cr.id_restaurante = r.id 
 	        JOIN categoria c ON c.id = cr.id_categoria
-      WHERE d.ciudad = $1
+      WHERE d.ciudad = $1 AND du.estado = true
       ORDER BY r.calificacion desc`,
         [city]
       );
@@ -202,7 +202,7 @@ async function PageRestaurant(req, res) {
               JOIN datos_usuarios du ON r.id = du.id
               JOIN categoria_res cr ON cr.id_restaurante = r.id 
               JOIN categoria c ON c.id = cr.id_categoria
-        WHERE d.ciudad = $1 AND c.nombre = $2
+        WHERE d.ciudad = $1 AND c.nombre = $2 AND du.estado = true
         ORDER BY r.calificacion desc`,
         [city, category]
       );
@@ -213,7 +213,7 @@ async function PageRestaurant(req, res) {
               JOIN datos_usuarios du ON r.id = du.id
               JOIN categoria_res cr ON cr.id_restaurante = r.id 
               JOIN categoria c ON c.id = cr.id_categoria
-        WHERE d.ciudad = $1 AND r.calificacion BETWEEN $2 AND $3
+        WHERE d.ciudad = $1 AND r.calificacion BETWEEN $2 AND $3 AND du.estado = true
         ORDER BY r.calificacion desc`,
         [city, 0, rating]
       );

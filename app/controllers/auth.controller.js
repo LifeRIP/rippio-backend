@@ -97,7 +97,7 @@ async function register(req, res) {
         hash,
         tipo_usuario,
         'https://firebasestorage.googleapis.com/v0/b/rippio.appspot.com/o/RestaurantIcon%2FDefaultUserIcon.jpg?alt=media&token=ffb4eaaf-b8e4-42b6-829e-d0398410d95f',
-        true,
+        tipo_usuario == 3 ? false : true,
         0,
       ]
     );

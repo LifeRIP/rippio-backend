@@ -76,7 +76,7 @@ async function getById(req, res) {
     // Si el usuario es un restaurante
 if (tipo_usuario.rows[0].tipo_usuario === 3) {
       const response = await pool.query(
-        `SELECT du.id, du.identificacion, du.nombre, du.apellido, du.email, du.telefono, du.tipo_usuario, du.img_icon, du.estado, du.creditos, 
+        `SELECT du.id, du.estado, du.identificacion, du.nombre, du.apellido, du.email, du.telefono, du.tipo_usuario, du.img_icon, du.estado, du.creditos, 
         r.calificacion, r.img_banner,
         dir.departamento, dir.ciudad, dir.barrio, dir.tipo_via, dir.numero_via, dir.numero_uno, dir.numero_dos, dir.observaciones,
         cr.id_categoria    
