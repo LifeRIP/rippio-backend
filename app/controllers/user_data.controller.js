@@ -60,16 +60,21 @@ async function getById(req, res) {
       return res.json(response.rows);
     }
 
+    
     // Si el usuario es un administrador
     if (tipo_usuario.rows[0].tipo_usuario === 2) {
+      console.log('entro admin');
+      
       const response = await pool.query(
         `SELECT du.id, du.identificacion, du.nombre, du.apellido, du.email, du.telefono, du.tipo_usuario, du.img_icon, du.estado, du.creditos, 
         a.id_direccion
 		    FROM datos_usuarios du
-		    INNER JOIN administrador a ON du.id = a.id
+		    LEFT JOIN administrador a ON du.id = a.id
         WHERE du.id = $1`,
         [id]
       );
+      console.log(response.rows);
+      
       return res.json(response.rows);
     }
 
@@ -108,4 +113,22 @@ if (tipo_usuario.rows[0].tipo_usuario === 3) {
   }
 }
 
-module.exports = { getAll, getById, getAllByRol };
+async function changeState(req, res) {
+  try {
+    const id = req.params.id;
+    await pool.query(
+      `UPDATE datos_usuarios 
+      SET estado = NOT estado
+      WHERE id = $1`,
+      [id]
+    );
+    res.json({ message: 'Estado actualizado correctamente' });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al actualizar el estado' });
+  }
+}
+
+module.exports = { getAll, getById, getAllByRol, changeState };

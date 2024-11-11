@@ -238,10 +238,56 @@ async function PageRestaurant(req, res) {
   }
 }
 
+async function getByCity(req, res) {
+  try {
+    const ciudad = req.query.ciudad;
+    const offset = req.query.offset || 0;
+    const limit = req.query.limit || 10;
+    
+    const response = await pool.query(
+      `SELECT 
+        du.id, 
+        du.nombre, 
+        du.img_icon, 
+        du.estado, 
+        d.ciudad, 
+        STRING_AGG(c.nombre, ', ') as category,
+        du.creado_en,
+        COUNT(*) OVER() as total_count
+          FROM datos_usuarios du
+          LEFT JOIN restaurante r ON du.id = r.id
+          LEFT JOIN direccion d ON d.id = r.id_direccion
+          LEFT JOIN categoria_res cr ON r.id = cr.id_restaurante
+          LEFT JOIN categoria c ON c.id = cr.id_categoria
+          WHERE d.ciudad = $1
+          GROUP BY du.id, du.nombre, du.img_icon, du.estado, d.ciudad, du.creado_en
+          ORDER BY du.creado_en DESC
+          OFFSET $2
+          LIMIT $3`,
+      [ciudad, offset, limit]
+    );
+
+    const totalCount = response.rows.length > 0 ? parseInt(response.rows[0].total_count, 10) : 0;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    res.status(200).json({
+      restaurants: response.rows,
+      totalPages: totalPages
+    });
+
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los restaurantes' });
+  }
+}
+
 module.exports = {
   getTopByCity,
   getCatAndProdByResId,
   getInfoById,
   getByCategory,
   PageRestaurant,
+  getByCity,
 };
