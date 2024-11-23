@@ -10,7 +10,8 @@ async function getTopByCity(req, res) {
       JOIN datos_usuarios du ON du.id = r.id
       WHERE d.ciudad = $1 AND du.estado = true
       ORDER BY r.calificacion DESC
-      LIMIT 20`, [ciudad]
+      LIMIT 20`,
+      [ciudad]
     );
     res.json(response.rows);
   } catch (error) {
@@ -37,37 +38,25 @@ async function getCatAndProdByResId(req, res) {
       [id]
     );
     const rows = response.rows;
-    const sections = [];
+    const sections = {};
     for (let row of rows) {
-      const section = sections.find((s) => s.id === row.id_seccion);
-      if (!section) {
-        sections.push({
+      if (!sections[row.id_seccion]) {
+        sections[row.id_seccion] = {
           id: row.id_seccion,
           nombre: row.sect_nombre,
-          productos: row.id_producto
-            ? [
-                {
-                  id: row.id_producto,
-                  nombre: row.nombre,
-                  descripcion: row.descripcion,
-                  costo_unit: row.cost_unit,
-                  img_product: row.img_product,
-                  disponible: row.disponible,
-                },
-              ]
-            : [],
-        });
-      } else {
-        if (row.id_producto) {
-          section.productos.push({
-            id: row.id_producto,
-            nombre: row.nombre,
-            descripcion: row.descripcion,
-            costo_unit: row.cost_unit,
-            img_product: row.img_product,
-            disponible: row.disponible,
-          });
-        }
+          productos: {},
+        };
+      }
+
+      if (row.id_producto) {
+        sections[row.id_seccion].productos[row.id_producto] = {
+          id: row.id_producto,
+          nombre: row.nombre,
+          descripcion: row.descripcion,
+          costo_unit: row.cost_unit,
+          img_product: row.img_product,
+          disponible: row.disponible,
+        };
       }
     }
     res.status(200).json(sections);
@@ -243,7 +232,7 @@ async function getByCity(req, res) {
     const ciudad = req.query.ciudad;
     const offset = req.query.offset || 0;
     const limit = req.query.limit || 10;
-    
+
     const response = await pool.query(
       `SELECT 
         du.id, 
@@ -267,14 +256,14 @@ async function getByCity(req, res) {
       [ciudad, offset, limit]
     );
 
-    const totalCount = response.rows.length > 0 ? parseInt(response.rows[0].total_count, 10) : 0;
+    const totalCount =
+      response.rows.length > 0 ? parseInt(response.rows[0].total_count, 10) : 0;
     const totalPages = Math.ceil(totalCount / limit);
 
     res.status(200).json({
       restaurants: response.rows,
-      totalPages: totalPages
+      totalPages: totalPages,
     });
-
   } catch (error) {
     console.error(error);
     res
