@@ -28,9 +28,7 @@ async function getCatAndProdByResId(req, res) {
     const { id } = req.params;
     const response = await pool.query(
       `SELECT 
-      p.nombre, p.disponible, p.descripcion, p.cost_unit, p.img_product,
-      s.id as id_seccion, sp.id_producto,
-      s.nombre as sect_nombre
+      *
       FROM seccion s
       LEFT JOIN seccion_prod sp ON s.id = sp.id_seccion
       LEFT JOIN producto p ON p.id = sp.id_producto
