@@ -24,6 +24,7 @@ async function getTopByCity(req, res) {
 
 async function getCatAndProdByResId(req, res) {
   try {
+    initime = new Date().getTime();
     const { id } = req.params;
     const response = await pool.query(
       `SELECT 
@@ -38,28 +39,42 @@ async function getCatAndProdByResId(req, res) {
       [id]
     );
     const rows = response.rows;
-    const sections = {};
+    const sections = [];
     for (let row of rows) {
-      if (!sections[row.id_seccion]) {
-        sections[row.id_seccion] = {
+      const section = sections.find((s) => s.id === row.id_seccion);
+      if (!section) {
+        sections.push({
           id: row.id_seccion,
           nombre: row.sect_nombre,
-          productos: {},
-        };
-      }
-
-      if (row.id_producto) {
-        sections[row.id_seccion].productos[row.id_producto] = {
-          id: row.id_producto,
-          nombre: row.nombre,
-          descripcion: row.descripcion,
-          costo_unit: row.cost_unit,
-          img_product: row.img_product,
-          disponible: row.disponible,
-        };
+          productos: row.id_producto
+            ? [
+                {
+                  id: row.id_producto,
+                  nombre: row.nombre,
+                  descripcion: row.descripcion,
+                  costo_unit: row.cost_unit,
+                  img_product: row.img_product,
+                  disponible: row.disponible,
+                },
+              ]
+            : [],
+        });
+      } else {
+        if (row.id_producto) {
+          section.productos.push({
+            id: row.id_producto,
+            nombre: row.nombre,
+            descripcion: row.descripcion,
+            costo_unit: row.cost_unit,
+            img_product: row.img_product,
+            disponible: row.disponible,
+          });
+        }
       }
     }
-    res.status(200).json(sections);
+    console.log('Tiempo de ejecución:', new Date().getTime() - initime);
+    //res.status(200).json(sections);
+    res.status(200).json('Success');
   } catch (error) {
     console.error(error);
     res
