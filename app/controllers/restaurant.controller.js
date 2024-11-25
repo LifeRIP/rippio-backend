@@ -24,7 +24,6 @@ async function getTopByCity(req, res) {
 
 async function getCatAndProdByResId(req, res) {
   try {
-    inittime = new Date().getTime();
     const { id } = req.params;
     const response = await pool.query(
       `SELECT 
@@ -60,9 +59,7 @@ async function getCatAndProdByResId(req, res) {
         };
       }
     }
-    console.log('Tiempo de ejecución: ', new Date().getTime() - inittime);
-    //res.status(200).json(sections);
-    res.status(200).json('Success');
+    res.status(200).json(sections);
   } catch (error) {
     console.error(error);
     res
