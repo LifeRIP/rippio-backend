@@ -96,8 +96,41 @@ async function getAverageSpending(req, res) {
   }
 }
 
+/*
+Descripción: Mostrar los productos más populares que los usuarios han pedido según el día
+*/
+async function getMostSoldProducts(req, res) {
+  try {
+    const { fecha } = req.query;
+
+    //Convertir la fecha a formato 'YYYY-MM-DD 00:00:00' y 'YYYY-MM-DD 23:59:59'
+
+    const fechaInicio = fecha + ' 00:00:00';
+    const fechaFin = fecha + ' 23:59:59';
+
+    const response = await pool.query(
+      `SELECT p.nombre, dp.cantidad_prod
+            FROM pedido pe
+            JOIN detalle_pedido dp ON pe.id = dp.id_pedido
+            JOIN producto p ON dp.id_producto = p.id
+            WHERE pe.fecha BETWEEN $1 AND $2
+            GROUP BY p.nombre, dp.cantidad_prod
+            ORDER BY dp.cantidad_prod DESC
+            LIMIT 20`,
+      [fechaInicio, fechaFin]
+    );
+    res.json(response.rows);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los productos' });
+  }
+}
+
 module.exports = {
   getMostPopularRestaurants,
   getMostRequestedDays,
   getAverageSpending,
+  getMostSoldProducts,
 };
