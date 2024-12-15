@@ -21,12 +21,15 @@ async function getMostPopularRestaurants(req, res) {
       [fechaInicio, fechaFin]
     );
 
-    const result = response.rows.map((row) => ({
+    const xvalues = response.rows.map((row) => row.nombre);
+    const yvalues = response.rows.map((row) => row.pedidos);
+
+    const result = {
       xlabel: 'Restaurante',
       ylabel: 'Pedidos',
-      xvalue: row.nombre,
-      yvalue: row.pedidos,
-    }));
+      xvalues,
+      yvalues,
+    };
 
     res.json(result);
   } catch (error) {
@@ -57,12 +60,16 @@ async function getMostRequestedDays(req, res) {
       'Viernes',
       'Sábado',
     ];
-    const result = response.rows.map((row) => ({
+
+    const xvalues = response.rows.map((row) => dias[parseInt(row.dia)]);
+    const yvalues = response.rows.map((row) => row.pedidos);
+
+    const result = {
       xlabel: 'Día',
       ylabel: 'Pedidos',
-      xvalue: dias[parseInt(row.dia)],
-      yvalue: row.pedidos,
-    }));
+      xvalues,
+      yvalues,
+    };
 
     res.json(result);
   } catch (error) {
@@ -93,12 +100,16 @@ async function getAverageSpending(req, res) {
       'Viernes',
       'Sábado',
     ];
-    const result = response.rows.map((row) => ({
+
+    const xvalues = response.rows.map((row) => dias[parseInt(row.dia)]);
+    const yvalues = response.rows.map((row) => row.gasto_promedio);
+
+    const result = {
       xlabel: 'Día',
       ylabel: 'Gasto Promedio',
-      xvalue: dias[parseInt(row.dia)],
-      yvalue: row.gasto_promedio,
-    }));
+      xvalues,
+      yvalues,
+    };
 
     res.json(result);
   } catch (error) {
@@ -130,12 +141,15 @@ async function getMostSoldProducts(req, res) {
       [fechaInicio, fechaFin]
     );
 
-    const result = response.rows.map((row) => ({
+    const xvalues = response.rows.map((row) => row.nombre);
+    const yvalues = response.rows.map((row) => row.cantidad);
+
+    const result = {
       xlabel: 'Producto',
       ylabel: 'Cantidad Vendida',
-      xvalue: row.nombre,
-      yvalue: row.cantidad,
-    }));
+      xvalues,
+      yvalues,
+    };
 
     res.json(result);
   } catch (error) {
@@ -222,14 +236,17 @@ async function getMostRequested(req, res) {
       [fechaInicio, fechaFin]
     );
 
-    const result = response.rows.map((row) => ({
+    const xvalues = response.rows.map((row) => row.category);
+    const yvalues = response.rows.map((row) => row.cantidad);
+
+    const result = {
       xlabel: 'Categoría',
       ylabel: 'Cantidad Vendida',
-      xvalue: row.category,
-      yvalue: row.cantidad,
-    }));
+      xvalues,
+      yvalues,
+    };
 
-    return res.status(200).json(result);
+    res.json(result);
   } catch (err) {
     console.log(err);
     res.status(500).json({
