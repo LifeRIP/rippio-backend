@@ -63,4 +63,41 @@ async function getMostRequestedDays(req, res) {
   }
 }
 
-module.exports = { getMostPopularRestaurants, getMostRequestedDays };
+// Mostrar el gasto promedio por día de la semana
+async function getAverageSpending(req, res) {
+  try {
+    const response = await pool.query(
+      `SELECT EXTRACT(DOW FROM fecha) as dia, AVG(costo_total) as gasto_promedio
+            FROM pedido
+            GROUP BY dia
+            ORDER BY dia`
+    );
+
+    // Convertir el número del día de la semana a su nombre
+    const dias = [
+      'Domingo',
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado',
+    ];
+    response.rows.forEach((row) => {
+      row.dia = dias[parseInt(row.dia)];
+    });
+
+    res.json(response.rows);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener el gasto promedio' });
+  }
+}
+
+module.exports = {
+  getMostPopularRestaurants,
+  getMostRequestedDays,
+  getAverageSpending,
+};
