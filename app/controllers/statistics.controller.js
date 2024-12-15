@@ -6,8 +6,7 @@ async function getMostPopularRestaurants(req, res) {
   try {
     const { fecha } = req.query;
 
-    //Convertir la fecha a formato 'YYYY-MM-DD 00:00:00' y 'YYYY-MM-DD 23:59:59'
-
+    // Convertir la fecha a formato 'YYYY-MM-DD 00:00:00' y 'YYYY-MM-DD 23:59:59'
     const fechaInicio = fecha + ' 00:00:00';
     const fechaFin = fecha + ' 23:59:59';
 
@@ -21,7 +20,18 @@ async function getMostPopularRestaurants(req, res) {
         LIMIT 20`,
       [fechaInicio, fechaFin]
     );
-    res.json(response.rows);
+
+    const xvalues = response.rows.map((row) => row.nombre);
+    const yvalues = response.rows.map((row) => row.pedidos);
+
+    const result = {
+      xlabel: 'Restaurante',
+      ylabel: 'Pedidos',
+      xvalues,
+      yvalues,
+    };
+
+    res.json(result);
   } catch (error) {
     console.log(error);
     res
@@ -50,11 +60,18 @@ async function getMostRequestedDays(req, res) {
       'Viernes',
       'Sábado',
     ];
-    response.rows.forEach((row) => {
-      row.dia = dias[parseInt(row.dia)];
-    });
 
-    res.json(response.rows);
+    const xvalues = response.rows.map((row) => dias[parseInt(row.dia)]);
+    const yvalues = response.rows.map((row) => row.pedidos);
+
+    const result = {
+      xlabel: 'Día',
+      ylabel: 'Pedidos',
+      xvalues,
+      yvalues,
+    };
+
+    res.json(result);
   } catch (error) {
     console.log(error);
     res
@@ -83,11 +100,18 @@ async function getAverageSpending(req, res) {
       'Viernes',
       'Sábado',
     ];
-    response.rows.forEach((row) => {
-      row.dia = dias[parseInt(row.dia)];
-    });
 
-    res.json(response.rows);
+    const xvalues = response.rows.map((row) => dias[parseInt(row.dia)]);
+    const yvalues = response.rows.map((row) => row.gasto_promedio);
+
+    const result = {
+      xlabel: 'Día',
+      ylabel: 'Gasto Promedio',
+      xvalues,
+      yvalues,
+    };
+
+    res.json(result);
   } catch (error) {
     console.log(error);
     res
@@ -96,30 +120,38 @@ async function getAverageSpending(req, res) {
   }
 }
 
-/*
-Descripción: Mostrar los productos más populares que los usuarios han pedido según el día
-*/
+// Mostrar los productos más populares que los usuarios han pedido según el día
 async function getMostSoldProducts(req, res) {
   try {
     const { fecha } = req.query;
 
-    //Convertir la fecha a formato 'YYYY-MM-DD 00:00:00' y 'YYYY-MM-DD 23:59:59'
-
+    // Convertir la fecha a formato 'YYYY-MM-DD 00:00:00' y 'YYYY-MM-DD 23:59:59'
     const fechaInicio = fecha + ' 00:00:00';
     const fechaFin = fecha + ' 23:59:59';
 
     const response = await pool.query(
-      `SELECT p.nombre, dp.cantidad_prod
+      `SELECT p.nombre, SUM(dp.cantidad_prod) as cantidad
             FROM pedido pe
             JOIN detalle_pedido dp ON pe.id = dp.id_pedido
             JOIN producto p ON dp.id_producto = p.id
             WHERE pe.fecha BETWEEN $1 AND $2
-            GROUP BY p.nombre, dp.cantidad_prod
-            ORDER BY dp.cantidad_prod DESC
+            GROUP BY p.nombre
+            ORDER BY cantidad DESC
             LIMIT 20`,
       [fechaInicio, fechaFin]
     );
-    res.json(response.rows);
+
+    const xvalues = response.rows.map((row) => row.nombre);
+    const yvalues = response.rows.map((row) => row.cantidad);
+
+    const result = {
+      xlabel: 'Producto',
+      ylabel: 'Cantidad Vendida',
+      xvalues,
+      yvalues,
+    };
+
+    res.json(result);
   } catch (error) {
     console.log(error);
     res
@@ -128,9 +160,105 @@ async function getMostSoldProducts(req, res) {
   }
 }
 
+async function getMostRequested(req, res) {
+  try {
+    const { fecha } = req.query;
+
+    //Convertir la fecha a formato 'YYYY-MM-DD 00:00:00' y 'YYYY-MM-DD 23:59:59'
+
+    const fechaInicio = fecha + ' 00:00:00';
+    const fechaFin = fecha + ' 23:59:59';
+
+    //Obtener los productos más solicitados en un día específico
+    const response = await pool.query(
+      `WITH categories AS (
+              SELECT 'Hamburguesa' AS category, '%hamburguesa%' AS keyword
+              UNION ALL
+              SELECT 'Pizza', '%pizza%'
+              UNION ALL
+              SELECT 'Sushi', '%sushi%'
+              UNION ALL
+              SELECT 'Salchipapa', '%salchipapa%'
+              UNION ALL
+              SELECT 'Pasta', '%pasta%'
+              UNION ALL
+              SELECT 'Pasta', '%fideos%'
+              UNION ALL
+              SELECT 'Pasta', '%spaghetti%'
+              UNION ALL
+              SELECT 'Ensalada', '%ensalada%'
+              UNION ALL
+              SELECT 'Ensalada', '%verdura%'
+              UNION ALL
+              SELECT 'Asado', '%asado%'
+              UNION ALL
+              SELECT 'Comida China', '%china%'
+              UNION ALL
+              SELECT 'Comida China', '%arroz%'
+              UNION ALL
+              SELECT 'Postre', '%postre%'
+              UNION ALL
+              SELECT 'Postre', '%pastel%'
+              UNION ALL
+              SELECT 'Postre', '%malteada%'
+              UNION ALL
+              SELECT 'Postre', '%helado%'
+              UNION ALL
+              SELECT 'Postre', '%cono%'
+              UNION ALL
+              SELECT 'Postre', '%brownie%'
+              UNION ALL
+              SELECT 'Postre', '%McFlurry%'
+              UNION ALL
+              SELECT 'Bebida', '%bebida%'
+              UNION ALL
+              SELECT 'Bebida', '%gaseosa%'
+              UNION ALL
+              SELECT 'Bebida', '%refresc%'
+              UNION ALL
+              SELECT 'Bebida', '%botella%'
+              UNION ALL
+              SELECT 'Bebida', '%jugo%'
+              UNION ALL
+              SELECT 'Bebida', '%agua%'
+              UNION ALL
+              SELECT 'Bebida', '%te%'
+              UNION ALL
+              SELECT 'Combo', '%combo%'
+          )
+          SELECT c.category, SUM(dp.cantidad_prod) AS cantidad
+          FROM PEDIDO p JOIN DETALLE_PEDIDO dp ON p.id = dp.id_pedido
+              JOIN PRODUCTO prod ON dp.id_producto = prod.id
+              JOIN categories c ON (prod.nombre ILIKE c.keyword OR prod.descripcion ILIKE c.keyword)
+          WHERE p.fecha BETWEEN $1 and $2 AND p.estado != 'Cancelado'
+          GROUP BY c.category
+          ORDER BY SUM(dp.cantidad_prod) DESC;`,
+      [fechaInicio, fechaFin]
+    );
+
+    const xvalues = response.rows.map((row) => row.category);
+    const yvalues = response.rows.map((row) => row.cantidad);
+
+    const result = {
+      xlabel: 'Categoría',
+      ylabel: 'Cantidad Vendida',
+      xvalues,
+      yvalues,
+    };
+
+    res.json(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      error: 'Ha ocurrido un error al obtener los productos más solicitados',
+    });
+  }
+}
+
 module.exports = {
   getMostPopularRestaurants,
   getMostRequestedDays,
   getAverageSpending,
   getMostSoldProducts,
+  getMostRequested,
 };
