@@ -11,12 +11,11 @@ async function getMostPopularRestaurants(req, res) {
     const fechaFin = fecha + ' 23:59:59';
 
     const response = await pool.query(
-      `SELECT du.id, du.nombre, r.calificacion, COUNT(p.id) as pedidos
-        FROM restaurante r
-        JOIN datos_usuarios du ON du.id = r.id
-        JOIN pedido p ON p.id_restaurante = r.id
+      `SELECT du.id, du.nombre, COUNT(p.id) as pedidos
+        FROM datos_usuarios du
+        JOIN pedido p ON p.id_restaurante = du.id
         WHERE p.fecha BETWEEN $1 AND $2
-        GROUP BY r.id, du.nombre
+        GROUP BY du.id, du.nombre
         ORDER BY pedidos DESC
         LIMIT 20`,
       [fechaInicio, fechaFin]
