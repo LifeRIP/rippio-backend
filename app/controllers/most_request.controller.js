@@ -10,6 +10,7 @@ async function getMostRequested(req, res) {
     const fechaFin = fecha + ' 23:59:59';
 
     //Obtener los productos más solicitados en un día específico
+
     const response = await pool.query(
       `WITH categories AS (
             SELECT 'Hamburguesa' AS category, '%hamburguesa%' AS keyword
@@ -66,7 +67,7 @@ async function getMostRequested(req, res) {
             UNION ALL
             SELECT 'Combo', '%combo%'
         )
-        SELECT c.category, SUM(dp.cantidad_prod) AS cantidad
+        SELECT c.category
         FROM PEDIDO p JOIN DETALLE_PEDIDO dp ON p.id = dp.id_pedido
 	        JOIN PRODUCTO prod ON dp.id_producto = prod.id
 	        JOIN categories c ON (prod.nombre ILIKE c.keyword OR prod.descripcion ILIKE c.keyword)
