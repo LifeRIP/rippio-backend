@@ -1,6 +1,7 @@
 const { pool } = require('../database/dbConfig');
 
-// Listar los restaurantes más populares según la cantidad de pedidos recibidos en un rango de tiempo específico (semanal, mensual o total).
+// Listar los restaurantes más populares según la cantidad de pedidos recibidos
+// en un rango de tiempo específico (semanal, mensual o total).
 async function getMostPopularRestaurants(req, res) {
   try {
     const { fecha } = req.query;
@@ -29,4 +30,37 @@ async function getMostPopularRestaurants(req, res) {
   }
 }
 
-module.exports = { getMostPopularRestaurants };
+// Mostrar en qué días de la semana se realizan más pedidos
+async function getMostRequestedDays(req, res) {
+  try {
+    const response = await pool.query(
+      `SELECT EXTRACT(DOW FROM fecha) as dia, COUNT(id) as pedidos
+            FROM pedido
+            GROUP BY dia
+            ORDER BY dia`
+    );
+
+    // Convertir el número del día de la semana a su nombre
+    const dias = [
+      'Domingo',
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado',
+    ];
+    response.rows.forEach((row) => {
+      row.dia = dias[parseInt(row.dia)];
+    });
+
+    res.json(response.rows);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al obtener los días de la semana' });
+  }
+}
+
+module.exports = { getMostPopularRestaurants, getMostRequestedDays };
