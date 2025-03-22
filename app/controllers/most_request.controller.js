@@ -4,6 +4,11 @@ async function getMostRequested(req, res) {
   try {
     const { fecha } = req.query;
 
+    //Si no se envía la fecha, enviar un mensaje de error
+    if (!fecha) {
+      return res.status(400).json({ message: 'Por favor, ingrese la fecha' });
+    }
+
     //Convertir la fecha a formato 'YYYY-MM-DD 00:00:00' y 'YYYY-MM-DD 23:59:59'
 
     const fechaInicio = fecha + ' 00:00:00';
@@ -76,6 +81,19 @@ async function getMostRequested(req, res) {
         ORDER BY SUM(dp.cantidad_prod) DESC;`,
       [fechaInicio, fechaFin]
     );
+
+    //Si no se encontraron productos más solicitados en la fecha especificada enviar un arreglo con objetos por defecto
+    if (response.rows.length === 0) {
+      return res.status(200).json([
+        { category: 'Hamburguesa' },
+        { category: 'Pizza' },
+        { category: 'Sushi' },
+        { category: 'Salchipapa' },
+        { category: 'Pasta' },
+        { category: 'Postre' },
+        { category: 'Bebida' },
+      ]);
+    }
 
     return res.status(200).json(response.rows);
   } catch (err) {
