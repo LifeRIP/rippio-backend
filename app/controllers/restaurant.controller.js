@@ -166,11 +166,7 @@ async function PageRestaurant(req, res) {
     const city = req.query.ciudad;
     const category = req.query.categoria;
     const rating = req.query.calificacion;
-
-    //Validar ciudad requerida
-    if (!city) {
-      return res.status(400).json({ error: 'El campo ciudad es requerido' });
-    }
+    const filterByCity = req.query.filtrarPorCiudad === 'true';
 
     //Validar categoria requerida
     if (!category && !rating) {
@@ -180,9 +176,9 @@ async function PageRestaurant(req, res) {
 	        JOIN datos_usuarios du ON r.id = du.id
 	        JOIN categoria_res cr ON cr.id_restaurante = r.id 
 	        JOIN categoria c ON c.id = cr.id_categoria
-      WHERE d.ciudad = $1 AND du.estado = true
+      WHERE ${filterByCity && city ? 'd.ciudad = $1 AND' : ''} du.estado = true
       ORDER BY r.calificacion desc`,
-        [city]
+        filterByCity && city ? [city] : []
       );
     } else if (category && !rating) {
       response = await pool.query(
@@ -191,9 +187,9 @@ async function PageRestaurant(req, res) {
               JOIN datos_usuarios du ON r.id = du.id
               JOIN categoria_res cr ON cr.id_restaurante = r.id 
               JOIN categoria c ON c.id = cr.id_categoria
-        WHERE d.ciudad = $1 AND c.nombre = $2 AND du.estado = true
+        WHERE ${filterByCity && city ? 'd.ciudad = $1 AND' : ''} ${filterByCity && city ? 'c.nombre = $2' : 'c.nombre = $1'} AND du.estado = true
         ORDER BY r.calificacion desc`,
-        [city, category]
+        filterByCity && city ? [city, category] : [category]
       );
     } else if (!category && rating) {
       response = await pool.query(
@@ -202,9 +198,9 @@ async function PageRestaurant(req, res) {
               JOIN datos_usuarios du ON r.id = du.id
               JOIN categoria_res cr ON cr.id_restaurante = r.id 
               JOIN categoria c ON c.id = cr.id_categoria
-        WHERE d.ciudad = $1 AND r.calificacion BETWEEN $2 AND $3 AND du.estado = true
+        WHERE ${filterByCity && city ? 'd.ciudad = $1 AND' : ''} r.calificacion BETWEEN ${filterByCity && city ? '$2' : '$1'} AND ${filterByCity && city ? '$3' : '$2'} AND du.estado = true
         ORDER BY r.calificacion desc`,
-        [city, 0, rating]
+        filterByCity && city ? [city, 0, rating] : [0, rating]
       );
     } else {
       response = await pool.query(
@@ -213,9 +209,9 @@ async function PageRestaurant(req, res) {
               JOIN datos_usuarios du ON r.id = du.id
               JOIN categoria_res cr ON cr.id_restaurante = r.id 
               JOIN categoria c ON c.id = cr.id_categoria
-        WHERE d.ciudad = $1 AND c.nombre = $2 AND r.calificacion BETWEEN $3 AND $4
+        WHERE ${filterByCity && city ? 'd.ciudad = $1 AND' : ''} ${filterByCity && city ? 'c.nombre = $2' : 'c.nombre = $1'} AND r.calificacion BETWEEN ${filterByCity && city ? '$3' : '$2'} AND ${filterByCity && city ? '$4' : '$3'}
         ORDER BY r.calificacion desc`,
-        [city, category, 0, rating]
+        filterByCity && city ? [city, category, 0, rating] : [category, 0, rating]
       );
     }
     res.status(200).json(response.rows);
