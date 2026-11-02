@@ -1,28 +1,21 @@
-const { Pool } = require('pg');
+﻿const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.POSTGRES_URL,
+  connectionTimeoutMillis: 10000,
 });
 
-pool.on('error', (err, client) => {
-  console.error('Error inesperado en cliente inactivo', err);
-  process.exit(-1);
+pool.on('error', (error) => {
+  console.error('Error inesperado en PostgreSQL:', error.code || error.message);
 });
 
-let firstConnection = true;
-
-function connectToDb() {
-  pool.connect((err, client, done) => {
-    if (err) console.error('Error al conectarse a la base de datos', err);
-    if (firstConnection) {
-      console.log('Conexión exitosa a la base de datos');
-      firstConnection = false;
-    }
-    if (process.env.NODE_ENV !== 'production') {
-      client.on('end', connectToDb); // Reintentar la conexión si se pierde
-      client.on('error', connectToDb); // Reintentar la conexión si hay un error
-    }
-  });
+async function connectToDb() {
+  try {
+    await pool.query('SELECT 1');
+    console.log('Conexión exitosa a la base de datos');
+  } catch (error) {
+    console.error('Error al conectarse a la base de datos:', error.code || error.message);
+  }
 }
 
 module.exports = { pool, connectToDb };

@@ -6,6 +6,9 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { connectToDb } = require('./app/database/dbConfig');
 const app = express();
+const { createServer } = require('node:http');
+const { attachChat } = require('./app/graphql/chat');
+const server = createServer(app);
 const port = process.env.PORT || 4000;
 
 // Configuracion
@@ -16,9 +19,10 @@ connectToDb();
 
 // Rutas API
 app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, '/app/pages/index.html'))
+  res.sendFile(path.join(__dirname, '/app/pages/index.html')),
 );
 app.use('/api', router);
+attachChat(app, server);
 app.get('/healthCheck', (req, res) => {
   res.json({ status: 'OK' });
 });
@@ -27,5 +31,5 @@ app.use('*', (req, res) => {
 });
 
 // Server
-app.listen(port);
+server.listen(port);
 console.log(`Servidor corriendo en http://localhost:${port}/`);
