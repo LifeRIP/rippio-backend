@@ -1,7 +1,7 @@
 const { buildSchema, GraphQLError } = require('graphql');
 const { createHandler } = require('graphql-http/lib/use/express');
 const { WebSocketServer } = require('ws');
-const { useServer } = require('graphql-ws/lib/use/ws');
+const { useServer } = require('graphql-ws/use/ws');
 const { chatService, ChatError } = require('../services/chat.service');
 const { allowedOrigins } = require('../services/cors');
 

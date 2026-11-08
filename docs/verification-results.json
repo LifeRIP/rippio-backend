@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-05",
+  "node": "v26.13.0",
+  "packageManager": "pnpm@12.16.1",
+  "cleanFrozenInstall": {
+    "command": "pnpm install --frozen-lockfile --prefer-offline",
+    "exitCode": 0
+  },
+  "tests": {
+    "command": "pnpm test",
+    "passed": 11,
+    "failed": 0
+  },
+  "tree": {
+    "command": "pnpm list --depth Infinity --json",
+    "exitCode": 0
+  },
+  "outdated": {},
+  "audit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0
+  },
+  "registryCrossCheck": {
+    "command": "npm outdated --json --prefer-online",
+    "exitCode": 0,
+    "outdated": {}
+  }
+}

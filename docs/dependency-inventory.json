@@ -1,0 +1,273 @@
+[
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "bcrypt",
+    "previousRange": "^5.1.1",
+    "previousInstalled": "5.1.1",
+    "latest": "6.0.0",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^6.0.0",
+    "finalGroup": "dependencies",
+    "finalVersion": "6.0.0"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "cookie-parser",
+    "previousRange": "^1.4.6",
+    "previousInstalled": "1.4.7",
+    "latest": "1.4.7",
+    "action": "remove",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": null,
+    "finalGroup": null,
+    "finalVersion": null
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "cors",
+    "previousRange": "^2.8.5",
+    "previousInstalled": "2.8.5",
+    "latest": "2.8.6",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^2.8.6",
+    "finalGroup": "dependencies",
+    "finalVersion": "2.8.6"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "express",
+    "previousRange": "^4.19.2",
+    "previousInstalled": "4.21.2",
+    "latest": "5.3.0",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^5.3.0",
+    "finalGroup": "dependencies",
+    "finalVersion": "5.3.0"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "graphql",
+    "previousRange": "^16.14.2",
+    "previousInstalled": "16.14.2",
+    "latest": "17.1.0",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^17.1.0",
+    "finalGroup": "dependencies",
+    "finalVersion": "17.1.0"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "graphql-http",
+    "previousRange": "^1.23.1",
+    "previousInstalled": "1.23.1",
+    "latest": "1.23.1",
+    "action": "unchanged",
+    "peerDependencies": {
+      "graphql": ">=0.11 <=17"
+    },
+    "peerDependenciesMeta": null,
+    "finalRange": "^1.23.1",
+    "finalGroup": "dependencies",
+    "finalVersion": "1.23.1"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "graphql-ws",
+    "previousRange": "~5.16.2",
+    "previousInstalled": "5.16.2",
+    "latest": "6.4.1",
+    "action": "update",
+    "peerDependencies": {
+      "ws": "^8",
+      "crossws": "~0.3 || ~0.4",
+      "graphql": "^15.10.1 || ^16 || ^17",
+      "@fastify/websocket": "^10 || ^11"
+    },
+    "peerDependenciesMeta": {
+      "ws": {
+        "optional": true
+      },
+      "crossws": {
+        "optional": true
+      },
+      "@fastify/websocket": {
+        "optional": true
+      }
+    },
+    "finalRange": "^6.4.1",
+    "finalGroup": "dependencies",
+    "finalVersion": "6.4.1"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "handlebars",
+    "previousRange": "^4.7.8",
+    "previousInstalled": "4.7.8",
+    "latest": "4.7.10",
+    "action": "remove",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": null,
+    "finalGroup": null,
+    "finalVersion": null
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "helmet",
+    "previousRange": "^7.1.0",
+    "previousInstalled": "7.2.0",
+    "latest": "8.3.0",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^8.3.0",
+    "finalGroup": "dependencies",
+    "finalVersion": "8.3.0"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "jsonwebtoken",
+    "previousRange": "^9.0.2",
+    "previousInstalled": "9.0.2",
+    "latest": "9.0.3",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^9.0.3",
+    "finalGroup": "dependencies",
+    "finalVersion": "9.0.3"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "moment",
+    "previousRange": "^2.30.1",
+    "previousInstalled": "2.30.1",
+    "latest": "2.31.0",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^2.31.0",
+    "finalGroup": "dependencies",
+    "finalVersion": "2.31.0"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "nodemailer",
+    "previousRange": "^6.9.13",
+    "previousInstalled": "6.10.0",
+    "latest": "10.3.1",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^10.3.1",
+    "finalGroup": "dependencies",
+    "finalVersion": "10.3.1"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "pg",
+    "previousRange": "^8.11.5",
+    "previousInstalled": "8.14.1",
+    "latest": "8.23.1",
+    "action": "update",
+    "peerDependencies": {
+      "pg-native": ">=3.0.1"
+    },
+    "peerDependenciesMeta": {
+      "pg-native": {
+        "optional": true
+      }
+    },
+    "finalRange": "^8.23.1",
+    "finalGroup": "dependencies",
+    "finalVersion": "8.23.1"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "uuid",
+    "previousRange": "^9.0.1",
+    "previousInstalled": "9.0.1",
+    "latest": "14.0.3",
+    "action": "remove",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": null,
+    "finalGroup": null,
+    "finalVersion": null
+  },
+  {
+    "project": "rippio-backend",
+    "group": "dependencies",
+    "package": "ws",
+    "previousRange": "^8.22.1",
+    "previousInstalled": "8.22.1",
+    "latest": "8.22.1",
+    "action": "unchanged",
+    "peerDependencies": {
+      "bufferutil": "^4.0.1",
+      "utf-8-validate": ">=5.0.2"
+    },
+    "peerDependenciesMeta": {
+      "bufferutil": {
+        "optional": true
+      },
+      "utf-8-validate": {
+        "optional": true
+      }
+    },
+    "finalRange": "^8.22.1",
+    "finalGroup": "dependencies",
+    "finalVersion": "8.22.1"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "devDependencies",
+    "package": "@electric-sql/pglite",
+    "previousRange": "^0.5.14",
+    "previousInstalled": "0.5.14",
+    "latest": "0.5.15",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^0.5.15",
+    "finalGroup": "devDependencies",
+    "finalVersion": "0.5.15"
+  },
+  {
+    "project": "rippio-backend",
+    "group": "devDependencies",
+    "package": "nodemon",
+    "previousRange": "^3.1.2",
+    "previousInstalled": "3.1.9",
+    "latest": "3.1.14",
+    "action": "update",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "finalRange": "^3.1.14",
+    "finalGroup": "devDependencies",
+    "finalVersion": "3.1.14"
+  }
+]
