@@ -4,9 +4,6 @@ const {
   createchat_order,
   getchat_order,
   insertchat_order,
-  createchat_admin,
-  getchat_admin,
-  insertchat_admin,
 } = require('../controllers/chat.controller');
 const auth_user = require('../middleware/auth.user.middleware');
 

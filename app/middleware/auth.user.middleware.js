@@ -10,7 +10,7 @@ const auth_user = async (req, res, next) => {
     const token = req.headers.authorization.split(' ').pop();
     const dataToken = await tokenVerify(token);
 
-    if (!dataToken.userID) {
+    if (!dataToken?.userID) {
       return res.status(401).json({ message: 'ERROR_ID_TOKEN' });
     }
 
@@ -18,6 +18,10 @@ const auth_user = async (req, res, next) => {
       'SELECT * FROM datos_usuarios WHERE id = $1',
       [dataToken.userID]
     );
+
+    if (!user.rows[0]) {
+      return res.status(401).json({ message: 'NOT_SESSION' });
+    }
 
     // Agregar el usuario a la request
     req.user = user.rows[0];

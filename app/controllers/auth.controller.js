@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('node:crypto');
 const { pool } = require('../database/dbConfig');
 const jwt = require('jsonwebtoken');
 const expiresIn = 30 * 24 * 60 * 60; // Expiracion del token en segundos (30 dias)
